@@ -5,18 +5,32 @@
  * data related to a single audio track.  Business rules and
  * validation logic live here (Encapsulation principle).
  */
+
+export type SongSourceType = 'url' | 'upload' | 'youtube';
+
 export class Song {
   public readonly id: string;
   public readonly title: string;
   public readonly artist: string;
   public readonly audioUrl: string;
+  public readonly sourceType: SongSourceType;
+  public readonly fileId: string | null;
   public readonly createdAt: Date;
 
-  constructor(title: string, artist: string, audioUrl: string, id?: string) {
+  constructor(
+    title: string,
+    artist: string,
+    audioUrl: string,
+    sourceType: SongSourceType = 'url',
+    fileId: string | null = null,
+    id?: string
+  ) {
     this.id        = id ?? Song.generateId();
     this.title     = title.trim();
     this.artist    = artist.trim();
     this.audioUrl  = audioUrl.trim();
+    this.sourceType = sourceType;
+    this.fileId    = fileId;
     this.createdAt = new Date();
   }
 
@@ -41,11 +55,30 @@ export class Song {
       if (this.audioUrl) errors.push('audioUrl must be a valid URL');
     }
 
+    // Validate sourceType
+    const validSourceTypes: SongSourceType[] = ['url', 'upload', 'youtube'];
+    if (!validSourceTypes.includes(this.sourceType)) {
+      errors.push('sourceType must be one of: url, upload, youtube');
+    }
+
+    // Validate fileId consistency
+    if ((this.sourceType === 'upload' || this.sourceType === 'youtube') && !this.fileId) {
+      errors.push('fileId is required for upload and youtube source types');
+    }
+    if (this.sourceType === 'url' && this.fileId !== null) {
+      errors.push('fileId must be null for url source type');
+    }
+
     return errors;
   }
 
   isValid(): boolean {
     return this.validate().length === 0;
+  }
+
+  /** Check if this song is from an uploaded file */
+  isUploadedFile(): boolean {
+    return this.sourceType === 'upload' || this.sourceType === 'youtube';
   }
 
   /** Serialize to a plain object (DTO) for JSON responses. */
@@ -55,13 +88,22 @@ export class Song {
       title:     this.title,
       artist:    this.artist,
       audioUrl:  this.audioUrl,
+      sourceType: this.sourceType,
+      fileId:    this.fileId,
       createdAt: this.createdAt.toISOString(),
     };
   }
 
   /** Reconstruct a Song from a DTO (e.g. after deserialization). */
   static fromDTO(dto: SongDTO): Song {
-    return new Song(dto.title, dto.artist, dto.audioUrl, dto.id);
+    return new Song(
+      dto.title,
+      dto.artist,
+      dto.audioUrl,
+      dto.sourceType || 'url',
+      dto.fileId || null,
+      dto.id
+    );
   }
 
   private static generateId(): string {
@@ -75,6 +117,8 @@ export interface SongDTO {
   title:     string;
   artist:    string;
   audioUrl:  string;
+  sourceType: SongSourceType;
+  fileId:    string | null;
   createdAt: string;
 }
 
