@@ -33,3 +33,7 @@ export function buildAuthRouter(): Router {
 
   return router;
 }
+
+// Default export for easier importing
+const router = buildAuthRouter();
+export default router;

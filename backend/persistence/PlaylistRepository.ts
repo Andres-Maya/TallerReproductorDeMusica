@@ -1,5 +1,5 @@
 import { Playlist, PlaylistDTO } from '../domain/Playlist';
-import { Song, SongDTO } from '../../Song';
+import { Song, SongDTO } from '../domain/Song';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
