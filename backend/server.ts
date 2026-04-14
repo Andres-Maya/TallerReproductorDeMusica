@@ -7,6 +7,7 @@ import playlistRoutes from './routes/playlists';
 // Load environment variables
 dotenv.config();
 
+// Force rebuild - v2
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -14,7 +15,7 @@ const PORT = process.env.PORT || 4000;
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? [
-        'https://andres-moya.github.io',
+        'https://andres-maya.github.io',
         /^https:\/\/.*\.github\.io$/,
         /^https:\/\/.*\.onrender\.com$/,
         /^https:\/\/.*\.netlify\.app$/
