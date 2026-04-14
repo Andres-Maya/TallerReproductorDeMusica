@@ -144,6 +144,12 @@ function renderMainView(): void {
  * Handle successful authentication
  */
 function handleAuthSuccess(): void {
+  // Get the saved session and set the token in ApiClient
+  const session = sessionManager.loadSession();
+  if (session) {
+    apiClient.setAuthToken(session.token);
+  }
+  
   Toast.success('Login successful!');
   renderMainView();
 }
@@ -156,10 +162,16 @@ async function handleLogout(): Promise<void> {
     await authApi.logout();
     sessionManager.clearSession();
     stateManager.clearUser();
+    apiClient.clearAuthToken();
     Toast.success('Logged out successfully');
     renderAuthView();
   } catch (error) {
-    Toast.error('Logout failed');
+    // Even if logout fails on backend, clear local session
+    sessionManager.clearSession();
+    stateManager.clearUser();
+    apiClient.clearAuthToken();
+    Toast.success('Logged out successfully');
+    renderAuthView();
     console.error('Logout error:', error);
   }
 }
@@ -173,6 +185,9 @@ async function initializeApp(): Promise<void> {
     const session = sessionManager.loadSession();
     
     if (session && sessionManager.isSessionValid()) {
+      // Set token in ApiClient
+      apiClient.setAuthToken(session.token);
+      
       // Validate session with backend
       try {
         const user = await authApi.getCurrentUser();
@@ -183,6 +198,7 @@ async function initializeApp(): Promise<void> {
         // Session invalid, clear it
         sessionManager.clearSession();
         stateManager.clearUser();
+        apiClient.clearAuthToken();
       }
     }
     
@@ -201,6 +217,7 @@ async function initializeApp(): Promise<void> {
 window.addEventListener('auth:expired', () => {
   sessionManager.clearSession();
   stateManager.clearUser();
+  apiClient.clearAuthToken();
   Toast.error('Session expired. Please login again.');
   renderAuthView();
 });
