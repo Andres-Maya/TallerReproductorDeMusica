@@ -22,8 +22,10 @@ const apiClient = new ApiClient();
 const authApi = new AuthApi(apiClient);
 const sessionManager = new SessionManager();
 const stateManager = new StateManager();
-const toast = new Toast();
 const errorBoundary = new ErrorBoundary();
+
+// Initialize Toast (static class)
+Toast.init();
 
 // Get app container
 const appContainer = document.getElementById('app');
@@ -142,7 +144,7 @@ function renderMainView(): void {
  * Handle successful authentication
  */
 function handleAuthSuccess(): void {
-  toast.success('Login successful!');
+  Toast.success('Login successful!');
   renderMainView();
 }
 
@@ -154,10 +156,10 @@ async function handleLogout(): Promise<void> {
     await authApi.logout();
     sessionManager.clearSession();
     stateManager.clearUser();
-    toast.success('Logged out successfully');
+    Toast.success('Logged out successfully');
     renderAuthView();
   } catch (error) {
-    toast.error('Logout failed');
+    Toast.error('Logout failed');
     console.error('Logout error:', error);
   }
 }
@@ -188,7 +190,7 @@ async function initializeApp(): Promise<void> {
     renderAuthView();
   } catch (error) {
     console.error('Initialization error:', error);
-    toast.error('Failed to initialize application');
+    Toast.error('Failed to initialize application');
     renderAuthView();
   }
 }
@@ -199,7 +201,7 @@ async function initializeApp(): Promise<void> {
 window.addEventListener('auth:expired', () => {
   sessionManager.clearSession();
   stateManager.clearUser();
-  toast.error('Session expired. Please login again.');
+  Toast.error('Session expired. Please login again.');
   renderAuthView();
 });
 
