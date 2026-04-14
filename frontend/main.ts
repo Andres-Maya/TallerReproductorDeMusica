@@ -1,6 +1,7 @@
 import { SessionManager } from './app/SessionManager';
 import { StateManager } from './app/StateManager';
 import { AuthApi } from './api/AuthApi';
+import { ApiClient } from './api/ApiClient';
 import { LoginForm } from './ui/components/LoginForm';
 import { RegisterForm } from './ui/components/RegisterForm';
 import { Toast } from './ui/components/Toast';
@@ -17,6 +18,8 @@ import './styles/main.css';
  */
 
 // Initialize global services
+const apiClient = new ApiClient();
+const authApi = new AuthApi(apiClient);
 const sessionManager = new SessionManager();
 const stateManager = new StateManager();
 const toast = new Toast();
@@ -64,7 +67,7 @@ function renderAuthView(): void {
     
     currentForm = new LoginForm(
       authContent,
-      AuthApi,
+      authApi,
       sessionManager,
       stateManager,
       handleAuthSuccess
@@ -81,7 +84,7 @@ function renderAuthView(): void {
     
     currentForm = new RegisterForm(
       authContent,
-      AuthApi,
+      authApi,
       sessionManager,
       stateManager,
       handleAuthSuccess
@@ -148,7 +151,7 @@ function handleAuthSuccess(): void {
  */
 async function handleLogout(): Promise<void> {
   try {
-    await AuthApi.logout();
+    await authApi.logout();
     sessionManager.clearSession();
     stateManager.clearUser();
     toast.success('Logged out successfully');
@@ -170,7 +173,7 @@ async function initializeApp(): Promise<void> {
     if (session && sessionManager.isSessionValid()) {
       // Validate session with backend
       try {
-        const user = await AuthApi.getCurrentUser();
+        const user = await authApi.getCurrentUser();
         stateManager.setUser(user);
         renderMainView();
         return;
