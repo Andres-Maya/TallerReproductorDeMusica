@@ -10,3 +10,7 @@ export {
   FilePlaylistRepository, 
   PlaylistWithSongs 
 } from './PlaylistRepository';
+export { 
+  FileRepository, 
+  FileFileRepository 
+} from './FileRepository';

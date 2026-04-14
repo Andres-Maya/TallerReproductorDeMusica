@@ -126,8 +126,29 @@ export class PlayerControls {
     // Handle errors
     this.audio.addEventListener('error', (e) => {
       console.error('Audio error:', e);
+      
+      let errorMessage = 'Failed to load audio file';
+      
+      // Provide more specific error messages based on error type
+      if (this.audio.error) {
+        switch (this.audio.error.code) {
+          case MediaError.MEDIA_ERR_ABORTED:
+            errorMessage = 'Audio loading was aborted';
+            break;
+          case MediaError.MEDIA_ERR_NETWORK:
+            errorMessage = 'Network error while loading audio';
+            break;
+          case MediaError.MEDIA_ERR_DECODE:
+            errorMessage = 'Audio file is corrupted or in an unsupported format';
+            break;
+          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            errorMessage = 'Audio source not supported. The URL may require authentication or have CORS restrictions.';
+            break;
+        }
+      }
+      
       this.updateState({
-        error: 'Failed to load audio file',
+        error: errorMessage,
         isPlaying: false,
       });
     });
@@ -153,6 +174,26 @@ export class PlayerControls {
   private loadSong(song: SongDTO): void {
     // Pause current playback
     this.audio.pause();
+
+    // Check if URL is potentially problematic
+    const url = song.audioUrl.toLowerCase();
+    const isExternalUrl = url.includes('youtube.com') || 
+                         url.includes('youtu.be') || 
+                         url.includes('soundcloud.com') ||
+                         url.includes('spotify.com');
+    
+    if (isExternalUrl) {
+      this.updateState({
+        currentSong: song,
+        currentTime: 0,
+        duration: 0,
+        isPlaying: false,
+        error: 'Cannot play external URLs directly. Please use the upload or YouTube extraction feature to add this song.',
+      });
+      this.render();
+      this.attachEventListeners();
+      return;
+    }
 
     // Load new song
     this.audio.src = song.audioUrl;
