@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "outDir": "./dist/frontend",
+    "rootDir": "./frontend",
+    "composite": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "baseUrl": "./frontend",
+    "paths": {
+      "@/*": ["./*"],
+      "@ui/*": ["./ui/*"],
+      "@app/*": ["./app/*"],
+      "@api/*": ["./api/*"],
+      "@types/*": ["./types/*"]
+    }
+  },
+  "include": ["frontend/**/*"],
+  "exclude": ["node_modules", "dist", "frontend/**/*.test.ts"]
+}
