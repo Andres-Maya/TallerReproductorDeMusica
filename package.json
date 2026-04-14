@@ -7,7 +7,7 @@
     "dev": "ts-node-dev --respawn --transpile-only backend/server.ts",
     "dev:backend": "ts-node-dev --respawn --transpile-only backend/server.ts",
     "dev:frontend": "vite",
-    "build": "npm run build:backend && npm run build:frontend",
+    "build": "tsc -p tsconfig.backend.json",
     "build:backend": "tsc -p tsconfig.backend.json",
     "build:frontend": "vite build",
     "start": "node dist/server.js",
