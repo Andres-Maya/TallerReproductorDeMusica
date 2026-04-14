@@ -3,10 +3,9 @@ import { PlaylistController } from '../controllers/PlaylistController';
 import { PlaylistManager } from '../services/PlaylistManager';
 import { FilePlaylistRepository } from '../persistence/PlaylistRepository';
 import { requireAuth } from '../middlewares/auth';
-import { requireOwnership } from '../middlewares/ownership';
 
 /**
- * buildPlaylistRouter — creates Express router for playlist endpoints.
+ * Playlist routes with authentication and ownership validation.
  * 
  * All routes require authentication. Routes that modify or access specific
  * playlists also require ownership validation.
@@ -23,34 +22,29 @@ import { requireOwnership } from '../middlewares/ownership';
  * 
  * **Validates: Requirements 9.3, 9.4, 9.6, 2.9**
  */
-export function buildPlaylistRouter(): Router {
-  const router = Router();
 
-  // Initialize dependencies
-  const playlistRepository = new FilePlaylistRepository();
-  const playlistManager = new PlaylistManager(playlistRepository);
-  const playlistController = new PlaylistController(playlistManager);
+const router = Router();
 
-  // All routes require authentication
-  router.use(requireAuth);
+// Initialize dependencies
+const playlistRepository = new FilePlaylistRepository();
+const playlistManager = new PlaylistManager(playlistRepository);
+const playlistController = new PlaylistController(playlistManager);
 
-  // Playlist CRUD operations
-  router.get('/', playlistController.getAllPlaylists);
-  router.post('/', playlistController.createPlaylist);
-  
-  // Routes that access specific playlists (ownership is validated in controller)
-  router.get('/:playlistId', playlistController.getPlaylist);
-  router.put('/:playlistId', playlistController.updatePlaylist);
-  router.delete('/:playlistId', playlistController.deletePlaylist);
-  
-  // Song management routes
-  router.post('/:playlistId/songs', playlistController.addSong);
-  router.delete('/:playlistId/songs/:songId', playlistController.removeSong);
-  router.get('/:playlistId/songs', playlistController.getSongs);
+// All routes require authentication
+router.use(requireAuth);
 
-  return router;
-}
+// Playlist CRUD operations
+router.get('/', playlistController.getAllPlaylists);
+router.post('/', playlistController.createPlaylist);
 
-// Default export for easier importing
-const router = buildPlaylistRouter();
+// Routes that access specific playlists (ownership is validated in controller)
+router.get('/:playlistId', playlistController.getPlaylist);
+router.put('/:playlistId', playlistController.updatePlaylist);
+router.delete('/:playlistId', playlistController.deletePlaylist);
+
+// Song management routes
+router.post('/:playlistId/songs', playlistController.addSong);
+router.delete('/:playlistId/songs/:songId', playlistController.removeSong);
+router.get('/:playlistId/songs', playlistController.getSongs);
+
 export default router;
