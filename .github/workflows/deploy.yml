@@ -37,9 +37,8 @@ jobs:
       - name: Build frontend
         run: npm run build:frontend
         env:
-          # IMPORTANTE: Cambia esta URL por la URL de tu backend desplegado
-          # Reemplaza esto con la URL que te dio Render
-          VITE_API_URL: https://TU-BACKEND-URL.onrender.com
+          # Backend desplegado en Render
+          VITE_API_URL: https://music-player-backend-yffr.onrender.com
       
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v4
