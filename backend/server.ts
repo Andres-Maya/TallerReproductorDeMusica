@@ -12,7 +12,12 @@ const PORT = process.env.PORT || 4000;
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://*.github.io', 'https://*.onrender.com', 'https://*.netlify.app']
+    ? [
+        'https://andres-moya.github.io',
+        /^https:\/\/.*\.github\.io$/,
+        /^https:\/\/.*\.onrender\.com$/,
+        /^https:\/\/.*\.netlify\.app$/
+      ]
     : '*',
   credentials: true
 }));

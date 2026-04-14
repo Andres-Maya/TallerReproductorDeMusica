@@ -62,10 +62,13 @@ function renderAuthView(): void {
       currentForm.destroy();
     }
     
-    currentForm = new LoginForm(authContent, {
-      onSuccess: handleAuthSuccess,
-      onError: (error) => toast.error(error)
-    });
+    currentForm = new LoginForm(
+      authContent,
+      AuthApi,
+      sessionManager,
+      stateManager,
+      handleAuthSuccess
+    );
   }
 
   function showRegister(): void {
@@ -76,10 +79,13 @@ function renderAuthView(): void {
       currentForm.destroy();
     }
     
-    currentForm = new RegisterForm(authContent, {
-      onSuccess: handleAuthSuccess,
-      onError: (error) => toast.error(error)
-    });
+    currentForm = new RegisterForm(
+      authContent,
+      AuthApi,
+      sessionManager,
+      stateManager,
+      handleAuthSuccess
+    );
   }
 
   loginTab.addEventListener('click', showLogin);
