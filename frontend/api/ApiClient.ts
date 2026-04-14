@@ -44,8 +44,10 @@ export class ApiClient {
   private readonly maxRetries = 3;
   private readonly retryDelay = 1000; // 1 second
 
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  constructor(baseUrl?: string) {
+    // Use provided baseUrl or fallback to environment variable or localhost
+    const url = baseUrl || import.meta.env.VITE_API_URL || 'http://localhost:4000';
+    this.baseUrl = url.endsWith('/') ? url.slice(0, -1) : url;
   }
 
   /**
