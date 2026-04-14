@@ -38,8 +38,8 @@ jobs:
         run: npm run build:frontend
         env:
           # IMPORTANTE: Cambia esta URL por la URL de tu backend desplegado
-          # Por ejemplo, si usas Render, Heroku, Railway, etc.
-          VITE_API_URL: https://tu-backend.onrender.com
+          # Reemplaza esto con la URL que te dio Render
+          VITE_API_URL: https://TU-BACKEND-URL.onrender.com
       
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v4
