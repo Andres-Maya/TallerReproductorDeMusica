@@ -2,7 +2,7 @@
   "name": "waveline-backend",
   "version": "1.0.0",
   "description": "Waveline Music Playlist Player — REST API backend in TypeScript",
-  "main": "dist/backend/server.js",
+  "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only backend/server.ts",
     "dev:backend": "ts-node-dev --respawn --transpile-only backend/server.ts",
@@ -10,7 +10,7 @@
     "build": "npm run build:backend && npm run build:frontend",
     "build:backend": "tsc -p tsconfig.backend.json",
     "build:frontend": "vite build",
-    "start": "node dist/backend/backend/server.js",
+    "start": "node dist/server.js",
     "test": "vitest --run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
