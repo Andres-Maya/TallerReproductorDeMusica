@@ -174,4 +174,20 @@ export class PlaylistApi {
   async getSongs(playlistId: string): Promise<SongDTO[]> {
     return this.apiClient.get<SongDTO[]>(`/api/v1/playlists/${playlistId}/songs`);
   }
+
+  /**
+   * Move a song to a new position in the playlist
+   * 
+   * @param playlistId - Playlist ID
+   * @param songId - Song ID
+   * @param newPosition - New position (0-based index)
+   * 
+   * Requirements: 3.5
+   */
+  async moveSong(playlistId: string, songId: string, newPosition: number): Promise<void> {
+    await this.apiClient.put<void>(
+      `/api/v1/playlists/${playlistId}/songs/${songId}/position`,
+      { newPosition }
+    );
+  }
 }

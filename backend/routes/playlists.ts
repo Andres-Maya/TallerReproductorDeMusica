@@ -46,5 +46,6 @@ router.delete('/:playlistId', playlistController.deletePlaylist);
 router.post('/:playlistId/songs', playlistController.addSong);
 router.delete('/:playlistId/songs/:songId', playlistController.removeSong);
 router.get('/:playlistId/songs', playlistController.getSongs);
+router.put('/:playlistId/songs/:songId/position', playlistController.updateSongPosition);
 
 export default router;

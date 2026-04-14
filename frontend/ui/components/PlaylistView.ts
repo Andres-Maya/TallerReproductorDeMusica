@@ -197,7 +197,7 @@ export class PlaylistView {
   /**
    * Add a song to the current playlist
    * 
-   * Requirements: 3.5
+   * Requirements: 3.5, 5.8
    */
   private async addSong(): Promise<void> {
     const appState = this.stateManager.getState();
@@ -237,6 +237,19 @@ export class PlaylistView {
     } catch {
       this.updateState({
         errors: { ...this.state.errors, addSong: 'Audio URL must be a valid URL' }
+      });
+      return;
+    }
+
+    // Check for duplicate song title (case-insensitive)
+    const newTitle = this.state.newSong.title.trim();
+    const isDuplicate = this.state.songs.some(
+      s => s.title.toLowerCase() === newTitle.toLowerCase()
+    );
+
+    if (isDuplicate) {
+      this.updateState({
+        errors: { ...this.state.errors, addSong: 'A song with this title already exists in the playlist' }
       });
       return;
     }
@@ -366,11 +379,29 @@ export class PlaylistView {
                 </div>
               ` : `
                 <ul class="songs-list">
-                  ${this.state.songs.map(song => `
-                    <li class="song-item">
+                  ${this.state.songs.map((song, index) => `
+                    <li class="song-item" data-song-id="${song.id}" data-song-index="${index}">
                       <div class="song-info">
                         <div class="song-title">${this.escapeHtml(song.title)}</div>
                         <div class="song-artist">${this.escapeHtml(song.artist)}</div>
+                      </div>
+                      <div class="song-actions">
+                        <button 
+                          class="btn-move-song btn-move-up" 
+                          data-song-id="${song.id}" 
+                          data-song-index="${index}"
+                          ${index === 0 ? 'disabled' : ''}
+                          title="Move up">
+                          ⬆️
+                        </button>
+                        <button 
+                          class="btn-move-song btn-move-down" 
+                          data-song-id="${song.id}" 
+                          data-song-index="${index}"
+                          ${index === this.state.songs.length - 1 ? 'disabled' : ''}
+                          title="Move down">
+                          ⬇️
+                        </button>
                       </div>
                     </li>
                   `).join('')}
@@ -571,6 +602,12 @@ export class PlaylistView {
 
     // Delete Confirmation Modal
     this.attachDeleteModalListeners();
+
+    // Song items (click to play)
+    this.attachSongClickListeners();
+
+    // Move song buttons
+    this.attachMoveSongListeners();
   }
 
   /**
@@ -688,6 +725,132 @@ export class PlaylistView {
         playlistToDelete: null,
       });
     });
+  }
+
+  /**
+   * Attach event listeners for song items (click to play)
+   * 
+   * @private
+   */
+  private attachSongClickListeners(): void {
+    const songItems = this.container.querySelectorAll('.song-item');
+    songItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const songId = (item as HTMLElement).dataset.songId;
+        const songIndex = parseInt((item as HTMLElement).dataset.songIndex || '0', 10);
+        
+        if (songId) {
+          this.playSong(songId, songIndex);
+        }
+      });
+    });
+  }
+
+  /**
+   * Play a song from the current playlist
+   * 
+   * @param songId - ID of the song to play
+   * @param songIndex - Index of the song in the playlist
+   * 
+   * Requirements: 3.6, 3.7, 3.8
+   * 
+   * @private
+   */
+  private playSong(songId: string, songIndex: number): void {
+    const appState = this.stateManager.getState();
+    const currentPlaylist = appState.playlists.find(p => p.id === appState.currentPlaylist);
+    
+    if (!currentPlaylist) {
+      return;
+    }
+
+    const song = this.state.songs.find(s => s.id === songId);
+    
+    if (!song) {
+      return;
+    }
+
+    // Set playback state in StateManager
+    this.stateManager.setPlaybackState({
+      currentSong: song,
+      playlistId: currentPlaylist.id,
+      playlistName: currentPlaylist.name,
+      currentIndex: songIndex,
+      totalTracks: this.state.songs.length,
+      hasPrevious: songIndex > 0,
+      hasNext: songIndex < this.state.songs.length - 1,
+    });
+  }
+
+  /**
+   * Attach event listeners for move song buttons
+   * 
+   * @private
+   */
+  private attachMoveSongListeners(): void {
+    const moveUpButtons = this.container.querySelectorAll('.btn-move-up');
+    const moveDownButtons = this.container.querySelectorAll('.btn-move-down');
+
+    moveUpButtons.forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const songId = (btn as HTMLElement).dataset.songId;
+        const songIndex = parseInt((btn as HTMLElement).dataset.songIndex || '0', 10);
+        
+        if (songId && songIndex > 0) {
+          await this.moveSong(songId, songIndex, songIndex - 1);
+        }
+      });
+    });
+
+    moveDownButtons.forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const songId = (btn as HTMLElement).dataset.songId;
+        const songIndex = parseInt((btn as HTMLElement).dataset.songIndex || '0', 10);
+        
+        if (songId && songIndex < this.state.songs.length - 1) {
+          await this.moveSong(songId, songIndex, songIndex + 1);
+        }
+      });
+    });
+  }
+
+  /**
+   * Move a song to a new position
+   * 
+   * @param songId - ID of the song to move
+   * @param currentIndex - Current index of the song
+   * @param newIndex - New index for the song
+   * 
+   * Requirements: 3.5
+   * 
+   * @private
+   */
+  private async moveSong(songId: string, currentIndex: number, newIndex: number): Promise<void> {
+    const appState = this.stateManager.getState();
+    
+    if (!appState.currentPlaylist) {
+      return;
+    }
+
+    // Optimistically update local state
+    const songs = [...this.state.songs];
+    const [song] = songs.splice(currentIndex, 1);
+    songs.splice(newIndex, 0, song);
+    this.updateState({ songs });
+
+    try {
+      // Call backend API
+      await this.playlistApi.moveSong(appState.currentPlaylist, songId, newIndex);
+      
+      // Refresh songs to ensure consistency
+      await this.loadSongs(appState.currentPlaylist);
+    } catch (error) {
+      // Revert on error
+      this.handleError(error, 'Failed to reorder song');
+      await this.loadSongs(appState.currentPlaylist);
+    }
   }
 
   /**
@@ -868,6 +1031,20 @@ export class PlaylistView {
         margin-bottom: 0.5rem;
         border-radius: 6px;
         background-color: #f7fafc;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .song-item:hover {
+        background-color: #edf2f7;
+        transform: translateX(4px);
+      }
+
+      .song-info {
+        flex: 1;
       }
 
       .song-title {
@@ -879,6 +1056,34 @@ export class PlaylistView {
       .song-artist {
         font-size: 0.9rem;
         color: #718096;
+      }
+
+      .song-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-left: 1rem;
+      }
+
+      .btn-move-song {
+        background: none;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        transition: all 0.2s;
+        opacity: 0.7;
+      }
+
+      .btn-move-song:hover:not(:disabled) {
+        opacity: 1;
+        background-color: #edf2f7;
+        border-color: #cbd5e0;
+      }
+
+      .btn-move-song:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
       }
 
       .loading-message,

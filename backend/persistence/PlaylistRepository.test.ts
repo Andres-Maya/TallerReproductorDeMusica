@@ -417,6 +417,129 @@ describe('FilePlaylistRepository', () => {
     });
   });
 
+  describe('updateSongPosition', () => {
+    it('should move a song to a new position', async () => {
+      const playlist = Playlist.create('Test', 'user_123');
+      await repository.create(playlist);
+      
+      const song1 = new Song('Song 1', 'Artist 1', 'https://example.com/song1.mp3');
+      const song2 = new Song('Song 2', 'Artist 2', 'https://example.com/song2.mp3');
+      const song3 = new Song('Song 3', 'Artist 3', 'https://example.com/song3.mp3');
+      
+      await repository.addSong(playlist.id, song1);
+      await repository.addSong(playlist.id, song2);
+      await repository.addSong(playlist.id, song3);
+      
+      // Move song1 from position 0 to position 2
+      await repository.updateSongPosition(playlist.id, song1.id, 2);
+      
+      const songs = await repository.getSongs(playlist.id);
+      expect(songs).toHaveLength(3);
+      expect(songs[0].title).toBe('Song 2');
+      expect(songs[1].title).toBe('Song 3');
+      expect(songs[2].title).toBe('Song 1');
+    });
+
+    it('should move a song up in the playlist', async () => {
+      const playlist = Playlist.create('Test', 'user_123');
+      await repository.create(playlist);
+      
+      const song1 = new Song('Song 1', 'Artist 1', 'https://example.com/song1.mp3');
+      const song2 = new Song('Song 2', 'Artist 2', 'https://example.com/song2.mp3');
+      const song3 = new Song('Song 3', 'Artist 3', 'https://example.com/song3.mp3');
+      
+      await repository.addSong(playlist.id, song1);
+      await repository.addSong(playlist.id, song2);
+      await repository.addSong(playlist.id, song3);
+      
+      // Move song3 from position 2 to position 0
+      await repository.updateSongPosition(playlist.id, song3.id, 0);
+      
+      const songs = await repository.getSongs(playlist.id);
+      expect(songs).toHaveLength(3);
+      expect(songs[0].title).toBe('Song 3');
+      expect(songs[1].title).toBe('Song 1');
+      expect(songs[2].title).toBe('Song 2');
+    });
+
+    it('should handle moving a song to adjacent position', async () => {
+      const playlist = Playlist.create('Test', 'user_123');
+      await repository.create(playlist);
+      
+      const song1 = new Song('Song 1', 'Artist 1', 'https://example.com/song1.mp3');
+      const song2 = new Song('Song 2', 'Artist 2', 'https://example.com/song2.mp3');
+      
+      await repository.addSong(playlist.id, song1);
+      await repository.addSong(playlist.id, song2);
+      
+      // Move song1 from position 0 to position 1
+      await repository.updateSongPosition(playlist.id, song1.id, 1);
+      
+      const songs = await repository.getSongs(playlist.id);
+      expect(songs).toHaveLength(2);
+      expect(songs[0].title).toBe('Song 2');
+      expect(songs[1].title).toBe('Song 1');
+    });
+
+    it('should do nothing if position is the same', async () => {
+      const playlist = Playlist.create('Test', 'user_123');
+      await repository.create(playlist);
+      
+      const song1 = new Song('Song 1', 'Artist 1', 'https://example.com/song1.mp3');
+      const song2 = new Song('Song 2', 'Artist 2', 'https://example.com/song2.mp3');
+      
+      await repository.addSong(playlist.id, song1);
+      await repository.addSong(playlist.id, song2);
+      
+      // Move song1 to its current position
+      await repository.updateSongPosition(playlist.id, song1.id, 0);
+      
+      const songs = await repository.getSongs(playlist.id);
+      expect(songs).toHaveLength(2);
+      expect(songs[0].title).toBe('Song 1');
+      expect(songs[1].title).toBe('Song 2');
+    });
+
+    it('should throw error if playlist does not exist', async () => {
+      await expect(repository.updateSongPosition('nonexistent', 'song_id', 0)).rejects.toThrow(
+        "Playlist with id 'nonexistent' not found"
+      );
+    });
+
+    it('should throw error if song does not exist in playlist', async () => {
+      const playlist = Playlist.create('Test', 'user_123');
+      await repository.create(playlist);
+      
+      await expect(repository.updateSongPosition(playlist.id, 'nonexistent_song', 0)).rejects.toThrow(
+        "Song with id 'nonexistent_song' not found in playlist"
+      );
+    });
+
+    it('should throw error if new position is negative', async () => {
+      const playlist = Playlist.create('Test', 'user_123');
+      await repository.create(playlist);
+      
+      const song = new Song('Song', 'Artist', 'https://example.com/song.mp3');
+      await repository.addSong(playlist.id, song);
+      
+      await expect(repository.updateSongPosition(playlist.id, song.id, -1)).rejects.toThrow(
+        'Invalid position: -1'
+      );
+    });
+
+    it('should throw error if new position is out of bounds', async () => {
+      const playlist = Playlist.create('Test', 'user_123');
+      await repository.create(playlist);
+      
+      const song = new Song('Song', 'Artist', 'https://example.com/song.mp3');
+      await repository.addSong(playlist.id, song);
+      
+      await expect(repository.updateSongPosition(playlist.id, song.id, 5)).rejects.toThrow(
+        'Invalid position: 5'
+      );
+    });
+  });
+
   describe('concurrent operations', () => {
     it('should handle multiple playlists created concurrently', async () => {
       const playlists = [

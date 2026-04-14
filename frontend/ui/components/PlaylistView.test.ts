@@ -452,6 +452,137 @@ describe('PlaylistView', () => {
       const errorMessage = container.querySelector('.form-error-general');
       expect(errorMessage?.textContent).toContain('valid URL');
     });
+
+    it('should reject duplicate song titles (case-insensitive)', async () => {
+      vi.spyOn(apiClient, 'get')
+        .mockResolvedValueOnce(mockPlaylists)
+        .mockResolvedValueOnce(mockSongs);
+
+      new PlaylistView(container, apiClient, stateManager);
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Select playlist
+      const playlistItem = container.querySelector('.playlist-item') as HTMLElement;
+      playlistItem.click();
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Open add song modal
+      const addSongBtn = container.querySelector('#add-song-btn') as HTMLButtonElement;
+      addSongBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Try to add song with duplicate title (exact match)
+      const titleInput = container.querySelector('#song-title') as HTMLInputElement;
+      const artistInput = container.querySelector('#song-artist') as HTMLInputElement;
+      const urlInput = container.querySelector('#song-url') as HTMLInputElement;
+
+      titleInput.value = 'Test Song 1';
+      artistInput.value = 'Different Artist';
+      urlInput.value = 'https://example.com/different.mp3';
+
+      titleInput.dispatchEvent(new Event('input'));
+      artistInput.dispatchEvent(new Event('input'));
+      urlInput.dispatchEvent(new Event('input'));
+
+      // Submit
+      const submitBtn = container.querySelector('#add-song-submit-btn') as HTMLButtonElement;
+      submitBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      const errorMessage = container.querySelector('.form-error-general');
+      expect(errorMessage?.textContent).toContain('A song with this title already exists in the playlist');
+    });
+
+    it('should reject duplicate song titles with different case', async () => {
+      vi.spyOn(apiClient, 'get')
+        .mockResolvedValueOnce(mockPlaylists)
+        .mockResolvedValueOnce(mockSongs);
+
+      new PlaylistView(container, apiClient, stateManager);
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Select playlist
+      const playlistItem = container.querySelector('.playlist-item') as HTMLElement;
+      playlistItem.click();
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Open add song modal
+      const addSongBtn = container.querySelector('#add-song-btn') as HTMLButtonElement;
+      addSongBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Try to add song with duplicate title (different case)
+      const titleInput = container.querySelector('#song-title') as HTMLInputElement;
+      const artistInput = container.querySelector('#song-artist') as HTMLInputElement;
+      const urlInput = container.querySelector('#song-url') as HTMLInputElement;
+
+      titleInput.value = 'TEST SONG 1';
+      artistInput.value = 'Different Artist';
+      urlInput.value = 'https://example.com/different.mp3';
+
+      titleInput.dispatchEvent(new Event('input'));
+      artistInput.dispatchEvent(new Event('input'));
+      urlInput.dispatchEvent(new Event('input'));
+
+      // Submit
+      const submitBtn = container.querySelector('#add-song-submit-btn') as HTMLButtonElement;
+      submitBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      const errorMessage = container.querySelector('.form-error-general');
+      expect(errorMessage?.textContent).toContain('A song with this title already exists in the playlist');
+    });
+
+    it('should allow adding song with unique title', async () => {
+      vi.spyOn(apiClient, 'get')
+        .mockResolvedValueOnce(mockPlaylists)
+        .mockResolvedValueOnce(mockSongs);
+      
+      const postSpy = vi.spyOn(apiClient, 'post').mockResolvedValue({
+        id: 'song-3',
+        title: 'Unique Song',
+        artist: 'New Artist',
+        audioUrl: 'https://example.com/unique.mp3',
+        createdAt: '2024-01-03T00:00:00Z',
+      });
+
+      new PlaylistView(container, apiClient, stateManager);
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Select playlist
+      const playlistItem = container.querySelector('.playlist-item') as HTMLElement;
+      playlistItem.click();
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Open add song modal
+      const addSongBtn = container.querySelector('#add-song-btn') as HTMLButtonElement;
+      addSongBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Add song with unique title
+      const titleInput = container.querySelector('#song-title') as HTMLInputElement;
+      const artistInput = container.querySelector('#song-artist') as HTMLInputElement;
+      const urlInput = container.querySelector('#song-url') as HTMLInputElement;
+
+      titleInput.value = 'Unique Song';
+      artistInput.value = 'New Artist';
+      urlInput.value = 'https://example.com/unique.mp3';
+
+      titleInput.dispatchEvent(new Event('input'));
+      artistInput.dispatchEvent(new Event('input'));
+      urlInput.dispatchEvent(new Event('input'));
+
+      // Submit
+      const submitBtn = container.querySelector('#add-song-submit-btn') as HTMLButtonElement;
+      submitBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      expect(postSpy).toHaveBeenCalledWith('/api/playlists/playlist-1/songs', {
+        title: 'Unique Song',
+        artist: 'New Artist',
+        audioUrl: 'https://example.com/unique.mp3',
+      });
+    });
   });
 
   describe('Playlist Deletion', () => {
@@ -551,6 +682,100 @@ describe('PlaylistView', () => {
       const songTitle = container.querySelector('.song-title');
       expect(songTitle?.innerHTML).not.toContain('<img');
       expect(songTitle?.textContent).toContain('<img src=x onerror=alert("xss")>');
+    });
+  });
+
+  describe('Song Playback', () => {
+    it('should set playback state when song is clicked', async () => {
+      vi.spyOn(apiClient, 'get')
+        .mockResolvedValueOnce(mockPlaylists)
+        .mockResolvedValueOnce(mockSongs);
+
+      new PlaylistView(container, apiClient, stateManager);
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Select playlist
+      const playlistItem = container.querySelector('.playlist-item') as HTMLElement;
+      playlistItem.click();
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Click on first song
+      const songItem = container.querySelector('.song-item') as HTMLElement;
+      songItem.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      const appState = stateManager.getState();
+      expect(appState.playbackState).toBeTruthy();
+      expect(appState.playbackState?.currentSong?.id).toBe('song-1');
+      expect(appState.playbackState?.playlistId).toBe('playlist-1');
+      expect(appState.playbackState?.playlistName).toBe('My Favorites');
+      expect(appState.playbackState?.currentIndex).toBe(0);
+      expect(appState.playbackState?.totalTracks).toBe(2);
+    });
+
+    it('should set correct navigation flags for first song', async () => {
+      vi.spyOn(apiClient, 'get')
+        .mockResolvedValueOnce(mockPlaylists)
+        .mockResolvedValueOnce(mockSongs);
+
+      new PlaylistView(container, apiClient, stateManager);
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Select playlist
+      const playlistItem = container.querySelector('.playlist-item') as HTMLElement;
+      playlistItem.click();
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Click on first song
+      const songItem = container.querySelector('.song-item') as HTMLElement;
+      songItem.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      const appState = stateManager.getState();
+      expect(appState.playbackState?.hasPrevious).toBe(false);
+      expect(appState.playbackState?.hasNext).toBe(true);
+    });
+
+    it('should set correct navigation flags for last song', async () => {
+      vi.spyOn(apiClient, 'get')
+        .mockResolvedValueOnce(mockPlaylists)
+        .mockResolvedValueOnce(mockSongs);
+
+      new PlaylistView(container, apiClient, stateManager);
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Select playlist
+      const playlistItem = container.querySelector('.playlist-item') as HTMLElement;
+      playlistItem.click();
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Click on last song
+      const songItems = container.querySelectorAll('.song-item');
+      const lastSong = songItems[songItems.length - 1] as HTMLElement;
+      lastSong.click();
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      const appState = stateManager.getState();
+      expect(appState.playbackState?.hasPrevious).toBe(true);
+      expect(appState.playbackState?.hasNext).toBe(false);
+    });
+
+    it('should make song items clickable with cursor pointer', async () => {
+      vi.spyOn(apiClient, 'get')
+        .mockResolvedValueOnce(mockPlaylists)
+        .mockResolvedValueOnce(mockSongs);
+
+      new PlaylistView(container, apiClient, stateManager);
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Select playlist
+      const playlistItem = container.querySelector('.playlist-item') as HTMLElement;
+      playlistItem.click();
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      const songItem = container.querySelector('.song-item') as HTMLElement;
+      const styles = window.getComputedStyle(songItem);
+      expect(styles.cursor).toBe('pointer');
     });
   });
 });

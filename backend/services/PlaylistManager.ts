@@ -125,7 +125,7 @@ export class PlaylistManager {
    * @returns Created song
    * @throws Error if playlist not found or not owned by user
    * 
-   * **Validates: Requirements 9.3, 9.6**
+   * **Validates: Requirements 3.5, 5.8, 9.3, 9.6**
    */
   async addSong(
     playlistId: string,
@@ -148,6 +148,15 @@ export class PlaylistManager {
     const errors = song.validate();
     if (errors.length > 0) {
       throw new ValidationError(errors);
+    }
+
+    // Check for duplicate song title (case-insensitive)
+    const isDuplicate = result.songs.some(
+      s => s.title.toLowerCase() === payload.title.trim().toLowerCase()
+    );
+
+    if (isDuplicate) {
+      throw new ValidationError(['A song with this title already exists in the playlist']);
     }
 
     await this.playlistRepository.addSong(playlistId, song, position);
@@ -209,6 +218,32 @@ export class PlaylistManager {
     }
 
     return result.songs;
+  }
+
+  /**
+   * Move a song to a new position in the playlist
+   * 
+   * @param playlistId - ID of the playlist
+   * @param userId - ID of the user (for ownership validation)
+   * @param songId - ID of the song to move
+   * @param newPosition - New position (0-based index)
+   * @throws Error if playlist not found, not owned by user, or position is invalid
+   * 
+   * **Validates: Requirements 3.5, 9.3, 9.6**
+   */
+  async moveSong(playlistId: string, userId: string, songId: string, newPosition: number): Promise<void> {
+    const result = await this.playlistRepository.findById(playlistId);
+    
+    if (!result) {
+      throw new NotFoundError(`Playlist '${playlistId}' not found`);
+    }
+
+    // Verify ownership
+    if (result.playlist.userId !== userId) {
+      throw new ForbiddenError('You do not have permission to modify this playlist');
+    }
+
+    await this.playlistRepository.updateSongPosition(playlistId, songId, newPosition);
   }
 }
 

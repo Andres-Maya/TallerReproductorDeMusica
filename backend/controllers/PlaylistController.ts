@@ -21,6 +21,7 @@ export class PlaylistController {
     this.addSong = this.addSong.bind(this);
     this.removeSong = this.removeSong.bind(this);
     this.getSongs = this.getSongs.bind(this);
+    this.updateSongPosition = this.updateSongPosition.bind(this);
   }
 
   /**
@@ -337,6 +338,52 @@ export class PlaylistController {
       }
       
       res.status(500).json({ error: 'Failed to retrieve songs' });
+    }
+  }
+
+  /**
+   * PUT /api/v1/playlists/:playlistId/songs/:songId/position
+   * Update song position in playlist
+   * 
+   * **Validates: Requirements 3.5, 9.3, 9.6**
+   */
+  async updateSongPosition(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json({ error: 'Authentication required' });
+        return;
+      }
+
+      const { playlistId, songId } = req.params;
+      const { newPosition } = req.body;
+
+      if (typeof newPosition !== 'number' || newPosition < 0) {
+        res.status(400).json({ error: 'Valid newPosition is required' });
+        return;
+      }
+
+      await this.playlistManager.moveSong(
+        playlistId,
+        req.user.userId,
+        songId,
+        newPosition
+      );
+
+      res.status(204).send();
+    } catch (error: any) {
+      console.error('Update song position error:', error);
+      
+      if (error.name === 'NotFoundError') {
+        res.status(404).json({ error: error.message });
+        return;
+      }
+      
+      if (error.name === 'ForbiddenError') {
+        res.status(403).json({ error: error.message });
+        return;
+      }
+      
+      res.status(500).json({ error: 'Failed to update song position' });
     }
   }
 }

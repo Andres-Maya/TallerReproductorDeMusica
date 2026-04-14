@@ -62,6 +62,15 @@ export interface PlaylistRepository {
    * @returns Array of songs in order
    */
   getSongs(playlistId: string): Promise<Song[]>;
+
+  /**
+   * Update the position of a song in a playlist.
+   * @param playlistId The playlist ID
+   * @param songId The song ID to move
+   * @param newPosition The new position (0-based index)
+   * @throws Error if playlist or song doesn't exist or position is invalid
+   */
+  updateSongPosition(playlistId: string, songId: string, newPosition: number): Promise<void>;
 }
 
 /**
@@ -273,6 +282,45 @@ export class FilePlaylistRepository implements PlaylistRepository {
       throw new Error(`Playlist with id '${playlistId}' not found`);
     }
     return result.songs;
+  }
+
+  async updateSongPosition(playlistId: string, songId: string, newPosition: number): Promise<void> {
+    // Verify playlist exists
+    const result = await this.findById(playlistId);
+    if (!result) {
+      throw new Error(`Playlist with id '${playlistId}' not found`);
+    }
+
+    const songs = result.songs;
+    const songIndex = songs.findIndex(s => s.id === songId);
+    
+    if (songIndex === -1) {
+      throw new Error(`Song with id '${songId}' not found in playlist '${playlistId}'`);
+    }
+
+    // Validate new position
+    if (newPosition < 0 || newPosition >= songs.length) {
+      throw new Error(`Invalid position: ${newPosition}. Must be between 0 and ${songs.length - 1}`);
+    }
+
+    // If position hasn't changed, no need to update
+    if (songIndex === newPosition) {
+      return;
+    }
+
+    // Remove song from current position
+    const [song] = songs.splice(songIndex, 1);
+    
+    // Insert song at new position
+    songs.splice(newPosition, 0, song);
+
+    // Update playlist file
+    const playlistPath = this.getPlaylistPath(playlistId);
+    const data: PlaylistFileData = {
+      ...result.playlist.toJSON(),
+      songs: songs.map(s => s.toJSON())
+    };
+    await fs.writeFile(playlistPath, JSON.stringify(data, null, 2), 'utf-8');
   }
 
   /**
