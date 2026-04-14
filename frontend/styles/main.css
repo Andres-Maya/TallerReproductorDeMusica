@@ -404,3 +404,32 @@ body {
     min-width: auto;
   }
 }
+
+/* Playlist and Player Layout */
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+#playlist-view-container {
+  flex: 1;
+}
+
+#player-controls-container {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 1rem 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+@media (max-width: 768px) {
+  .app-main {
+    gap: 1rem;
+  }
+
+  #player-controls-container {
+    padding: 0.5rem 0;
+  }
+}

@@ -12,9 +12,8 @@
  * Requirements: 2.11, 3.5, 1.2
  */
 
-import { ApiClient } from '../../api/ApiClient';
+import { PlaylistApi, SongDTO } from '../../api/PlaylistApi';
 import { StateManager, Playlist } from '../../app/StateManager';
-import type { SongDTO } from '../../../Song';
 
 /**
  * PlaylistView component state
@@ -51,18 +50,18 @@ interface PlaylistViewState {
  */
 export class PlaylistView {
   private container: HTMLElement;
-  private apiClient: ApiClient;
+  private playlistApi: PlaylistApi;
   private stateManager: StateManager;
   private state: PlaylistViewState;
   private unsubscribe?: () => void;
 
   constructor(
     container: HTMLElement,
-    apiClient: ApiClient,
+    playlistApi: PlaylistApi,
     stateManager: StateManager
   ) {
     this.container = container;
-    this.apiClient = apiClient;
+    this.playlistApi = playlistApi;
     this.stateManager = stateManager;
 
     // Initialize state
@@ -124,7 +123,7 @@ export class PlaylistView {
     this.updateState({ isLoading: true, errors: {} });
 
     try {
-      const playlists = await this.apiClient.get<Playlist[]>('/api/playlists');
+      const playlists = await this.playlistApi.getPlaylists();
       this.stateManager.setPlaylists(playlists);
     } catch (error) {
       this.handleError(error, 'Failed to load playlists');
@@ -142,7 +141,7 @@ export class PlaylistView {
    */
   private async loadSongs(playlistId: string): Promise<void> {
     try {
-      const songs = await this.apiClient.get<SongDTO[]>(`/api/playlists/${playlistId}/songs`);
+      const songs = await this.playlistApi.getSongs(playlistId);
       this.updateState({ songs });
     } catch (error) {
       this.handleError(error, 'Failed to load songs');
@@ -166,9 +165,7 @@ export class PlaylistView {
     this.updateState({ isCreatingPlaylist: true, errors: {} });
 
     try {
-      const newPlaylist = await this.apiClient.post<Playlist>('/api/playlists', {
-        name: this.state.newPlaylistName.trim()
-      });
+      const newPlaylist = await this.playlistApi.createPlaylist(this.state.newPlaylistName.trim());
 
       // Update playlists in state
       const appState = this.stateManager.getState();
@@ -247,14 +244,11 @@ export class PlaylistView {
     this.updateState({ isAddingSong: true, errors: {} });
 
     try {
-      const newSong = await this.apiClient.post<SongDTO>(
-        `/api/playlists/${appState.currentPlaylist}/songs`,
-        {
-          title: this.state.newSong.title.trim(),
-          artist: this.state.newSong.artist.trim(),
-          audioUrl: this.state.newSong.audioUrl.trim(),
-        }
-      );
+      const newSong = await this.playlistApi.addSong(appState.currentPlaylist, {
+        title: this.state.newSong.title.trim(),
+        artist: this.state.newSong.artist.trim(),
+        audioUrl: this.state.newSong.audioUrl.trim(),
+      });
 
       // Update songs list
       this.updateState({
@@ -280,7 +274,7 @@ export class PlaylistView {
     this.updateState({ isLoading: true, errors: {} });
 
     try {
-      await this.apiClient.delete(`/api/playlists/${playlistId}`);
+      await this.playlistApi.deletePlaylist(playlistId);
 
       // Update playlists in state
       const appState = this.stateManager.getState();

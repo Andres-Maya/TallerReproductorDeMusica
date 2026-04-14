@@ -1,9 +1,12 @@
 import { SessionManager } from './app/SessionManager';
 import { StateManager } from './app/StateManager';
 import { AuthApi } from './api/AuthApi';
+import { PlaylistApi } from './api/PlaylistApi';
 import { ApiClient } from './api/ApiClient';
 import { LoginForm } from './ui/components/LoginForm';
 import { RegisterForm } from './ui/components/RegisterForm';
+import { PlaylistView } from './ui/components/PlaylistView';
+import { PlayerControls } from './ui/components/PlayerControls';
 import { Toast } from './ui/components/Toast';
 import { ErrorBoundary } from './ui/components/ErrorBoundary';
 import './styles/main.css';
@@ -26,12 +29,17 @@ if (!appContainer) {
 // Initialize global services
 const apiClient = new ApiClient();
 const authApi = new AuthApi(apiClient);
+const playlistApi = new PlaylistApi(apiClient);
 const sessionManager = new SessionManager();
 const stateManager = new StateManager();
 const errorBoundary = new ErrorBoundary(appContainer);
 
 // Initialize Toast (static class)
 Toast.init();
+
+// Global references to components
+let playlistView: PlaylistView | null = null;
+let playerControls: PlayerControls | null = null;
 
 /**
  * Render the login/register view
@@ -115,13 +123,8 @@ function renderMainView(): void {
       </header>
       
       <main class="app-main">
-        <div class="welcome-message">
-          <h2>Welcome to Waveline!</h2>
-          <p>Your music player is ready. Playlist management coming soon...</p>
-          <p class="info">✅ Authentication working</p>
-          <p class="info">✅ Backend connected</p>
-          <p class="info">⏳ Playlist UI in progress</p>
-        </div>
+        <div id="playlist-view-container"></div>
+        <div id="player-controls-container"></div>
       </main>
     </div>
   `;
@@ -137,6 +140,18 @@ function renderMainView(): void {
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', handleLogout);
+  }
+
+  // Initialize PlaylistView
+  const playlistViewContainer = document.getElementById('playlist-view-container');
+  if (playlistViewContainer) {
+    playlistView = new PlaylistView(playlistViewContainer, playlistApi, stateManager);
+  }
+
+  // Initialize PlayerControls
+  const playerControlsContainer = document.getElementById('player-controls-container');
+  if (playerControlsContainer) {
+    playerControls = new PlayerControls(playerControlsContainer, stateManager);
   }
 }
 
@@ -159,6 +174,16 @@ function handleAuthSuccess(): void {
  */
 async function handleLogout(): Promise<void> {
   try {
+    // Clean up components
+    if (playlistView) {
+      playlistView.destroy();
+      playlistView = null;
+    }
+    if (playerControls) {
+      playerControls.destroy();
+      playerControls = null;
+    }
+
     await authApi.logout();
     sessionManager.clearSession();
     stateManager.clearUser();
