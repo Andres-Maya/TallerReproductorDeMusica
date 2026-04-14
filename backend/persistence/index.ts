@@ -5,3 +5,8 @@
  */
 
 export { UserRepository, FileUserRepository } from './UserRepository';
+export { 
+  PlaylistRepository, 
+  FilePlaylistRepository, 
+  PlaylistWithSongs 
+} from './PlaylistRepository';
