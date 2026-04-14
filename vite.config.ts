@@ -3,6 +3,7 @@ import path from 'path';
 
 export default defineConfig({
   root: 'frontend',
+  base: process.env.NODE_ENV === 'production' ? '/TallerReproductorDeMusica/' : '/',
   
   build: {
     outDir: '../dist/frontend',
