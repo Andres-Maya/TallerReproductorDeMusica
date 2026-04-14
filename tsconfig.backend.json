@@ -12,6 +12,6 @@
     "types": ["node"],
     "moduleResolution": "node"
   },
-  "include": ["backend/**/*", "*.ts"],
-  "exclude": ["node_modules", "dist", "backend/**/*.test.ts", "frontend/**/*"]
+  "include": ["backend/**/*", "Song.ts", "Playlist.ts", "TrackList.ts", "TrackNode.ts", "ApiResponse.ts", "paramHelper.ts", "errorHandler.ts", "app.ts", "server.ts", "index.ts", "PlaylistController.ts", "SongController.ts", "PlaylistManager.ts"],
+  "exclude": ["node_modules", "dist", "backend/**/*.test.ts", "frontend/**/*", "vite.config.ts", "vitest.config.ts"]
 }
