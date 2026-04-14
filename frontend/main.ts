@@ -17,21 +17,21 @@ import './styles/main.css';
  * **Validates: Requirements 2.11, 8.1, 8.2, 8.3, 8.4**
  */
 
+// Get app container first
+const appContainer = document.getElementById('app');
+if (!appContainer) {
+  throw new Error('App container not found');
+}
+
 // Initialize global services
 const apiClient = new ApiClient();
 const authApi = new AuthApi(apiClient);
 const sessionManager = new SessionManager();
 const stateManager = new StateManager();
-const errorBoundary = new ErrorBoundary();
+const errorBoundary = new ErrorBoundary(appContainer);
 
 // Initialize Toast (static class)
 Toast.init();
-
-// Get app container
-const appContainer = document.getElementById('app');
-if (!appContainer) {
-  throw new Error('App container not found');
-}
 
 /**
  * Render the login/register view
