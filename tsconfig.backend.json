@@ -5,11 +5,13 @@
     "module": "CommonJS",
     "lib": ["ES2020"],
     "outDir": "./dist/backend",
-    "rootDir": "./backend",
+    "rootDir": ".",
     "composite": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "types": ["node"],
+    "moduleResolution": "node"
   },
-  "include": ["backend/**/*"],
-  "exclude": ["node_modules", "dist", "backend/**/*.test.ts"]
+  "include": ["backend/**/*", "*.ts"],
+  "exclude": ["node_modules", "dist", "backend/**/*.test.ts", "frontend/**/*"]
 }

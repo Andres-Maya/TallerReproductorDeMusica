@@ -50,7 +50,7 @@ Esta guía te ayudará a desplegar tu aplicación en GitHub Pages (frontend) y u
 3. Conecta tu repositorio de GitHub
 4. Configura:
    - **Name:** `music-player-backend`
-   - **Root Directory:** `TallerReproductorDeMusica`
+   - **Root Directory:** (déjalo VACÍO)
    - **Build Command:** `npm install && npm run build:backend`
    - **Start Command:** `npm start`
    - **Environment Variables:**
@@ -141,6 +141,15 @@ El frontend estará en: http://localhost:3000
 **Solución:**
 1. Ve a la configuración de tu servicio de backend (Render/Railway/Heroku)
 2. Agrega la variable de entorno JWT_SECRET con un valor seguro (mínimo 32 caracteres)
+
+### Error: "Root directory does not exist" en Render
+
+**Causa:** El Root Directory está mal configurado.
+
+**Solución:**
+1. Ve a Settings en tu servicio de Render
+2. Deja el campo "Root Directory" COMPLETAMENTE VACÍO
+3. Guarda y haz un Manual Deploy
 
 ### El despliegue de GitHub Actions falla
 
