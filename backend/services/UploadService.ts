@@ -99,7 +99,13 @@ export class UploadService {
     );
 
     // 6. Add song to playlist
-    await this.playlistManager.addSong(playlistId, song, userId);
+    await this.playlistManager.addSong(playlistId, userId, {
+      title: song.title,
+      artist: song.artist,
+      audioUrl: song.audioUrl,
+      sourceType: song.sourceType,
+      fileId: song.fileId
+    });
 
     return { file: uploadedFile, song };
   }

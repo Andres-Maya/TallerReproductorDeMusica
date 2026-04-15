@@ -127,4 +127,6 @@ export interface CreateSongPayload {
   title:    string;
   artist:   string;
   audioUrl: string;
+  sourceType?: 'url' | 'upload' | 'youtube';
+  fileId?: string | null;
 }

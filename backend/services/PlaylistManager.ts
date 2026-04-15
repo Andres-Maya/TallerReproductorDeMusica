@@ -144,7 +144,13 @@ export class PlaylistManager {
       throw new ForbiddenError('You do not have permission to modify this playlist');
     }
 
-    const song = new Song(payload.title, payload.artist, payload.audioUrl);
+    const song = new Song(
+      payload.title, 
+      payload.artist, 
+      payload.audioUrl,
+      payload.sourceType || 'url',
+      payload.fileId || null
+    );
     const errors = song.validate();
     if (errors.length > 0) {
       throw new ValidationError(errors);
