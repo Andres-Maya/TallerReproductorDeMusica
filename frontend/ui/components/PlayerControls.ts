@@ -43,6 +43,7 @@ export class PlayerControls {
   private audio: HTMLAudioElement;
   private youtubePlayer: any; // YouTube IFrame Player
   private youtubePlayerReady: boolean = false;
+  private youtubePlayerInitialized: boolean = false; // Track if current player is ready
   private unsubscribe?: () => void;
   private updateInterval?: number;
 
@@ -290,6 +291,7 @@ export class PlayerControls {
         console.warn('[PlayerControls] Error destroying player:', e);
       }
       this.youtubePlayer = null;
+      this.youtubePlayerInitialized = false;
     }
 
     // Clear update interval
@@ -338,6 +340,7 @@ export class PlayerControls {
         events: {
           onReady: (event: any) => {
             console.log('[PlayerControls] YouTube player ready');
+            this.youtubePlayerInitialized = true;
             const duration = event.target.getDuration();
             console.log('[PlayerControls] Video duration:', duration);
             this.updateState({ duration });
@@ -405,7 +408,11 @@ export class PlayerControls {
    */
   private async play(): Promise<void> {
     try {
-      if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+      if (this.state.currentSong?.sourceType === 'youtube') {
+        if (!this.youtubePlayer || !this.youtubePlayerInitialized) {
+          console.warn('[PlayerControls] YouTube player not ready yet');
+          return;
+        }
         console.log('[PlayerControls] Playing YouTube video');
         this.youtubePlayer.playVideo();
         this.updateState({ isPlaying: true, error: null });
@@ -429,7 +436,7 @@ export class PlayerControls {
    * Requirements: 3.6
    */
   private pause(): void {
-    if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+    if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer && this.youtubePlayerInitialized) {
       this.youtubePlayer.pauseVideo();
     } else {
       this.audio.pause();
@@ -458,7 +465,7 @@ export class PlayerControls {
    * Requirements: 3.8
    */
   private seek(time: number): void {
-    if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+    if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer && this.youtubePlayerInitialized) {
       this.youtubePlayer.seekTo(time, true);
     } else {
       this.audio.currentTime = time;
@@ -474,7 +481,7 @@ export class PlayerControls {
    * Requirements: 3.7
    */
   private setVolume(volume: number): void {
-    if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+    if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer && this.youtubePlayerInitialized) {
       this.youtubePlayer.setVolume(volume * 100);
     } else {
       this.audio.volume = volume;
@@ -490,7 +497,7 @@ export class PlayerControls {
    */
   private toggleMute(): void {
     if (this.state.isMuted) {
-      if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+      if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer && this.youtubePlayerInitialized) {
         this.youtubePlayer.unMute();
         this.youtubePlayer.setVolume(this.state.volume * 100);
       } else {
@@ -498,7 +505,7 @@ export class PlayerControls {
       }
       this.updateState({ isMuted: false });
     } else {
-      if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+      if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer && this.youtubePlayerInitialized) {
         this.youtubePlayer.mute();
       } else {
         this.audio.volume = 0;
