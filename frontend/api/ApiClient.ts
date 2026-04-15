@@ -65,6 +65,13 @@ export class ApiClient {
   }
 
   /**
+   * Check if authentication token is set
+   */
+  hasAuthToken(): boolean {
+    return this.token !== null && this.token !== '';
+  }
+
+  /**
    * Perform a GET request
    */
   async get<T>(endpoint: string): Promise<T> {

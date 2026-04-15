@@ -156,16 +156,14 @@ function renderMainView(): void {
   const storageQuotaContainer = document.getElementById('storage-quota-container');
   if (storageQuotaContainer) {
     storageQuotaDisplay = new StorageQuotaDisplay(storageQuotaContainer, uploadApi);
-    // Load storage quota after a delay to ensure token is set
-    setTimeout(() => {
-      if (storageQuotaDisplay) {
-        storageQuotaDisplay.load().catch((error) => {
-          console.warn('Storage quota not available:', error);
-          // Hide the storage quota display if there's an error
-          storageQuotaContainer.style.display = 'none';
-        });
-      }
-    }, 500); // Increased delay to 500ms
+    // Load storage quota only if token is available
+    if (apiClient.hasAuthToken()) {
+      storageQuotaDisplay.load().catch((error) => {
+        console.warn('Storage quota not available:', error);
+        // Hide the storage quota display if there's an error
+        storageQuotaContainer.style.display = 'none';
+      });
+    }
   }
 
   // Initialize UploadModal
