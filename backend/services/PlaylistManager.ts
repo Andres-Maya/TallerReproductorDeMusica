@@ -9,6 +9,7 @@ import { PlaylistRepository } from '../persistence/PlaylistRepository';
  * All operations require a userId to ensure multi-user data separation.
  * 
  * Updated: 2025-02-13 - Added backward compatibility for playlists without userId
+ * Rebuild: 2025-02-13 - Force rebuild to deploy backward compatibility fixes
  * 
  * **Validates: Requirements 9.1, 9.2, 9.3, 9.5**
  */
