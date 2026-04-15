@@ -107,7 +107,7 @@ export class YouTubeExtractor {
       throw new Error(`YouTube API HTTP ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
     
     if (!data.items || data.items.length === 0) {
       console.error('[YouTubeExtractor] Video not found in API response');
@@ -199,7 +199,7 @@ export class YouTubeExtractor {
       throw new Error(`oEmbed API HTTP ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
     
     return {
       videoId: videoId,
