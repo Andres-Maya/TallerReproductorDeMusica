@@ -281,6 +281,23 @@ export class PlayerControls {
       return;
     }
 
+    // Destroy existing YouTube player if it exists
+    if (this.youtubePlayer) {
+      console.log('[PlayerControls] Destroying existing YouTube player');
+      try {
+        this.youtubePlayer.destroy();
+      } catch (e) {
+        console.warn('[PlayerControls] Error destroying player:', e);
+      }
+      this.youtubePlayer = null;
+    }
+
+    // Clear update interval
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = undefined;
+    }
+
     this.updateState({
       currentSong: song,
       currentTime: 0,
@@ -308,76 +325,74 @@ export class PlayerControls {
         return;
       }
 
-      console.log('[PlayerControls] YouTube API ready, initializing player...');
-
-      if (this.youtubePlayer) {
-        console.log('[PlayerControls] Loading video into existing player:', videoId);
-        this.youtubePlayer.loadVideoById(videoId);
-      } else {
-        console.log('[PlayerControls] Creating new YouTube player:', videoId);
-        this.youtubePlayer = new (window as any).YT.Player('youtube-player', {
-          height: '0',
-          width: '0',
-          videoId: videoId,
-          playerVars: {
-            autoplay: 0,
-            controls: 0,
-          },
-          events: {
-            onReady: (event: any) => {
-              console.log('[PlayerControls] YouTube player ready');
-              const duration = event.target.getDuration();
-              console.log('[PlayerControls] Video duration:', duration);
-              this.updateState({ duration });
-              
-              // Set volume
-              event.target.setVolume(this.state.volume * 100);
-              
-              // Start time update interval
-              if (this.updateInterval) {
-                clearInterval(this.updateInterval);
-              }
-              this.updateInterval = window.setInterval(() => {
-                if (this.youtubePlayer && this.state.currentSong?.sourceType === 'youtube') {
+      console.log('[PlayerControls] YouTube API ready, creating new player...');
+      
+      this.youtubePlayer = new (window as any).YT.Player('youtube-player', {
+        height: '0',
+        width: '0',
+        videoId: videoId,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+        },
+        events: {
+          onReady: (event: any) => {
+            console.log('[PlayerControls] YouTube player ready');
+            const duration = event.target.getDuration();
+            console.log('[PlayerControls] Video duration:', duration);
+            this.updateState({ duration });
+            
+            // Set volume
+            event.target.setVolume(this.state.volume * 100);
+            
+            // Start time update interval
+            if (this.updateInterval) {
+              clearInterval(this.updateInterval);
+            }
+            this.updateInterval = window.setInterval(() => {
+              if (this.youtubePlayer && this.state.currentSong?.sourceType === 'youtube') {
+                try {
                   const currentTime = this.youtubePlayer.getCurrentTime();
                   this.updateState({ currentTime });
+                } catch (e) {
+                  // Player might be destroyed
                 }
-              }, 100);
-            },
-            onStateChange: (event: any) => {
-              const YT = (window as any).YT;
-              console.log('[PlayerControls] YouTube player state changed:', event.data);
-              if (event.data === YT.PlayerState.PLAYING) {
-                this.updateState({ isPlaying: true });
-              } else if (event.data === YT.PlayerState.PAUSED) {
-                this.updateState({ isPlaying: false });
-              } else if (event.data === YT.PlayerState.ENDED) {
-                this.updateState({ isPlaying: false });
               }
-            },
-            onError: (event: any) => {
-              console.error('[PlayerControls] YouTube player error:', event.data);
-              let errorMessage = 'Failed to load YouTube video';
-              switch (event.data) {
-                case 2:
-                  errorMessage = 'Invalid YouTube video ID';
-                  break;
-                case 5:
-                  errorMessage = 'HTML5 player error';
-                  break;
-                case 100:
-                  errorMessage = 'Video not found or private';
-                  break;
-                case 101:
-                case 150:
-                  errorMessage = 'Video cannot be embedded';
-                  break;
-              }
-              this.updateState({ error: errorMessage, isPlaying: false });
-            },
+            }, 100);
           },
-        });
-      }
+          onStateChange: (event: any) => {
+            const YT = (window as any).YT;
+            console.log('[PlayerControls] YouTube player state changed:', event.data);
+            if (event.data === YT.PlayerState.PLAYING) {
+              this.updateState({ isPlaying: true });
+            } else if (event.data === YT.PlayerState.PAUSED) {
+              this.updateState({ isPlaying: false });
+            } else if (event.data === YT.PlayerState.ENDED) {
+              this.updateState({ isPlaying: false });
+            }
+          },
+          onError: (event: any) => {
+            console.error('[PlayerControls] YouTube player error:', event.data);
+            let errorMessage = 'Failed to load YouTube video';
+            switch (event.data) {
+              case 2:
+                errorMessage = 'Invalid YouTube video ID';
+                break;
+              case 5:
+                errorMessage = 'HTML5 player error';
+                break;
+              case 100:
+                errorMessage = 'Video not found or private';
+                break;
+              case 101:
+              case 150:
+                errorMessage = 'Video cannot be embedded';
+                break;
+            }
+            this.updateState({ error: errorMessage, isPlaying: false });
+          },
+        },
+      });
     };
 
     initPlayer();
