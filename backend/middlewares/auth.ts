@@ -86,7 +86,10 @@ export function requireAuth(
 ): void {
   const token = extractToken(req);
   
+  console.log('[requireAuth] Path:', req.path, 'Has token:', !!token);
+  
   if (!token) {
+    console.log('[requireAuth] No token found in headers:', req.headers.authorization);
     res.status(401).json({
       success: false,
       error: 'Authentication required. Please provide a valid token.',
@@ -97,6 +100,7 @@ export function requireAuth(
   const payload = validateToken(token);
   
   if (!payload) {
+    console.log('[requireAuth] Token validation failed');
     res.status(401).json({
       success: false,
       error: 'Invalid or expired token.',
@@ -104,6 +108,7 @@ export function requireAuth(
     return;
   }
   
+  console.log('[requireAuth] ✓ Authenticated user:', payload.userId);
   // Attach decoded token payload to request
   req.user = payload;
   next();
