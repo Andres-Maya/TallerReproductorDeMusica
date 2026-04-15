@@ -718,8 +718,60 @@ export class PlayerControls {
    */
   private updateState(partial: Partial<PlayerControlsState>): void {
     this.state = { ...this.state, ...partial };
+    
+    // Don't re-render if only currentTime changed (to avoid destroying YouTube player)
+    // Just update the progress bar directly
+    if (Object.keys(partial).length === 1 && 'currentTime' in partial) {
+      this.updateProgressBar();
+      return;
+    }
+    
+    // Don't re-render if only isPlaying changed (to avoid destroying YouTube player)
+    // Just update the play button directly
+    if (Object.keys(partial).length === 1 && 'isPlaying' in partial) {
+      this.updatePlayButton();
+      return;
+    }
+    
     this.render();
     this.attachEventListeners();
+  }
+
+  /**
+   * Update progress bar without full re-render
+   * 
+   * @private
+   */
+  private updateProgressBar(): void {
+    const { currentTime, duration } = this.state;
+    const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+    
+    const progressFill = this.container.querySelector('.progress-fill') as HTMLElement;
+    const progressSlider = this.container.querySelector('.progress-slider') as HTMLInputElement;
+    const timeCurrentEl = this.container.querySelector('.time-current');
+    
+    if (progressFill) {
+      progressFill.style.width = `${progressPercent}%`;
+    }
+    if (progressSlider) {
+      progressSlider.value = currentTime.toString();
+    }
+    if (timeCurrentEl) {
+      timeCurrentEl.textContent = this.formatTime(currentTime);
+    }
+  }
+
+  /**
+   * Update play button without full re-render
+   * 
+   * @private
+   */
+  private updatePlayButton(): void {
+    const playPauseBtn = this.container.querySelector('#play-pause-btn');
+    if (playPauseBtn) {
+      playPauseBtn.textContent = this.state.isPlaying ? '⏸️' : '▶️';
+      playPauseBtn.setAttribute('title', this.state.isPlaying ? 'Pause' : 'Play');
+    }
   }
 
   /**
