@@ -1,12 +1,12 @@
 /**
  * YouTubeExtractor Service
  * 
- * Extracts audio from YouTube videos using ytdl-core library.
+ * Extracts audio from YouTube videos using @distube/ytdl-core library.
  * Provides video information and audio extraction capabilities.
  * 
  * Validates: Requirements 2.4, 2.6, 2.8, 2.11
  * 
- * NOTE: Requires ytdl-core package (already installed)
+ * NOTE: Uses @distube/ytdl-core (maintained fork of ytdl-core)
  */
 
 export interface YouTubeVideoInfo {
@@ -29,15 +29,15 @@ export class YouTubeExtractor {
    */
   async getVideoInfo(url: string): Promise<YouTubeVideoInfo> {
     try {
-      // Dynamic import of ytdl-core
-      const ytdl = await import('ytdl-core');
+      // Dynamic import of @distube/ytdl-core
+      const ytdl = await import('@distube/ytdl-core');
 
       // Validate URL
       if (!ytdl.validateURL(url)) {
         throw new Error('Invalid YouTube URL');
       }
 
-      // Get video info
+      // Get video info with error handling
       const info = await ytdl.getInfo(url);
       const videoDetails = info.videoDetails;
 
@@ -49,10 +49,18 @@ export class YouTubeExtractor {
         thumbnail: videoDetails.thumbnails[0]?.url || '',
       };
     } catch (error: any) {
+      console.error('YouTube getVideoInfo error:', error);
+      
       if (error.message?.includes('unavailable')) {
         throw new Error('Video is unavailable or restricted');
       }
-      throw new Error(`Failed to get video info: ${error.message}`);
+      if (error.message?.includes('private')) {
+        throw new Error('Video is private');
+      }
+      if (error.statusCode === 410) {
+        throw new Error('Video has been removed');
+      }
+      throw new Error(`Failed to get video info: ${error.message || 'Unknown error'}`);
     }
   }
 
@@ -69,18 +77,23 @@ export class YouTubeExtractor {
    */
   async extractAudio(url: string): Promise<Buffer> {
     try {
-      // Dynamic import of ytdl-core
-      const ytdl = await import('ytdl-core');
+      // Dynamic import of @distube/ytdl-core
+      const ytdl = await import('@distube/ytdl-core');
 
       // Validate URL
       if (!ytdl.validateURL(url)) {
         throw new Error('Invalid YouTube URL');
       }
 
-      // Get audio stream
+      // Get audio stream with better options
       const audioStream = ytdl.default(url, {
         quality: 'highestaudio',
         filter: 'audioonly',
+        requestOptions: {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          }
+        }
       });
 
       // Collect stream data into buffer
@@ -97,17 +110,29 @@ export class YouTubeExtractor {
         });
 
         audioStream.on('error', (error: Error) => {
+          console.error('Audio stream error:', error);
           reject(new Error(`Failed to extract audio: ${error.message}`));
         });
+
+        // Add timeout
+        setTimeout(() => {
+          audioStream.destroy();
+          reject(new Error('Audio extraction timeout'));
+        }, 60000); // 60 second timeout
       });
     } catch (error: any) {
+      console.error('YouTube extractAudio error:', error);
+      
       if (error.message?.includes('unavailable')) {
         throw new Error('Video is unavailable or restricted');
       }
       if (error.message?.includes('copyright')) {
         throw new Error('Video is copyrighted and cannot be downloaded');
       }
-      throw new Error(`Failed to extract audio: ${error.message}`);
+      if (error.message?.includes('timeout')) {
+        throw new Error('Audio extraction timed out - video may be too long');
+      }
+      throw new Error(`Failed to extract audio: ${error.message || 'Unknown error'}`);
     }
   }
 
