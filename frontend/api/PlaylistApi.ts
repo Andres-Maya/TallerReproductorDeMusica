@@ -42,6 +42,8 @@ export interface SongDTO {
   title: string;
   artist: string;
   audioUrl: string;
+  sourceType: 'url' | 'upload' | 'youtube';
+  fileId: string | null;
   createdAt: string;
 }
 
