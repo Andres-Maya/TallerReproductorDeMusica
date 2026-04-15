@@ -55,6 +55,14 @@ export class PlayerControls {
     this.audio = new Audio();
     this.audio.preload = 'metadata';
 
+    // Create YouTube player container outside of the main container
+    // This prevents it from being destroyed during re-renders
+    const youtubeContainer = document.createElement('div');
+    youtubeContainer.id = 'youtube-player-container';
+    youtubeContainer.style.display = 'none';
+    youtubeContainer.innerHTML = '<div id="youtube-player"></div>';
+    document.body.appendChild(youtubeContainer);
+
     // Load YouTube IFrame API
     this.loadYouTubeAPI();
 
@@ -593,9 +601,6 @@ export class PlayerControls {
           </div>
         ` : ''}
 
-        <!-- Hidden YouTube player -->
-        <div id="youtube-player" style="display: none;"></div>
-
         <div class="player-info">
           ${currentSong ? `
             <div class="song-info">
@@ -1039,6 +1044,12 @@ export class PlayerControls {
     if (this.youtubePlayer) {
       this.youtubePlayer.destroy();
       this.youtubePlayer = null;
+    }
+
+    // Remove YouTube player container from DOM
+    const youtubeContainer = document.getElementById('youtube-player-container');
+    if (youtubeContainer) {
+      youtubeContainer.remove();
     }
 
     // Clear interval
