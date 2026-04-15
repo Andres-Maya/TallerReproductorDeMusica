@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import playlistRoutes from './routes/playlists';
+import uploadRoutes from './routes/upload';
 
 // Load environment variables
 dotenv.config();
@@ -28,6 +29,7 @@ app.use(express.json());
 // Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/playlists', playlistRoutes);
+app.use('/api/v1', uploadRoutes);
 
 // Health check
 app.get('/health', (_req, res) => {

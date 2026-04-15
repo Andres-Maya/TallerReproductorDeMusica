@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { UploadController } from '../controllers/UploadController';
-import { FileController } from '../controllers/FileController';
-import { YouTubeController } from '../controllers/YouTubeController';
+import { dependencies } from '../config/dependencies';
 import { requireAuth } from '../middlewares/auth';
 
 // Configure multer for file uploads
@@ -17,13 +15,22 @@ const upload = multer({
  * Upload routes
  * 
  * All routes require authentication.
+ * 
+ * Routes:
+ * - POST /upload - Upload audio file and add to playlist
+ * - GET /files/:fileId - Retrieve audio file for streaming
+ * - DELETE /files/:fileId - Delete uploaded file
+ * - GET /storage/quota - Get user storage quota information
+ * - POST /youtube/preview - Get YouTube video information
+ * - POST /youtube/extract - Extract audio from YouTube video
+ * 
+ * Validates: Requirements 12.8
  */
-export function createUploadRoutes(
-  uploadController: UploadController,
-  fileController: FileController,
-  youtubeController: YouTubeController
-): Router {
+function buildUploadRouter(): Router {
   const router = Router();
+
+  // Get controllers from dependency container
+  const { uploadController, fileController, youtubeController } = dependencies;
 
   // All routes require authentication
   router.use(requireAuth);
@@ -44,3 +51,7 @@ export function createUploadRoutes(
 
   return router;
 }
+
+// Default export for easier importing
+const router = buildUploadRouter();
+export default router;
