@@ -16,6 +16,7 @@ export interface YouTubeVideoInfo {
   author: string;
   duration: number;
   thumbnail: string;
+  isAvailable: boolean;
 }
 
 export class YouTubeExtractor {
@@ -127,6 +128,7 @@ export class YouTubeExtractor {
       author: snippet.channelTitle,
       duration: duration,
       thumbnail: snippet.thumbnails.high?.url || snippet.thumbnails.default?.url || '',
+      isAvailable: true,
     };
   }
 
@@ -164,6 +166,7 @@ export class YouTubeExtractor {
         author: videoDetails.author.name,
         duration: parseInt(videoDetails.lengthSeconds),
         thumbnail: videoDetails.thumbnails[0]?.url || '',
+        isAvailable: true,
       };
     } catch (error: any) {
       console.error('[YouTubeExtractor] ytdl-core error details:', {
@@ -207,6 +210,7 @@ export class YouTubeExtractor {
       author: data.author_name || 'Unknown Author',
       duration: 0, // oEmbed doesn't provide duration
       thumbnail: data.thumbnail_url || '',
+      isAvailable: true,
     };
   }
 
