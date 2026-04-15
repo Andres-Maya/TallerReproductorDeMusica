@@ -22,6 +22,8 @@ import './styles/main.css';
  * and renders the appropriate UI (login or main app).
  * 
  * **Validates: Requirements 2.11, 8.1, 8.2, 8.3, 8.4**
+ * 
+ * Version: 1.0.1 - Fixed storage quota 401 error
  */
 
 // Get app container first
