@@ -585,7 +585,7 @@ export class PlaylistView {
     });
 
     // Add Song button
-    const addSongBtn = this.container.querySelector('rgba(58, 58, 78, 1)-song-btn');
+    const addSongBtn = this.container.querySelector('#add-song-btn');
     addSongBtn?.addEventListener('click', () => {
       this.updateState({
         showAddSongModal: true,
@@ -650,7 +650,7 @@ export class PlaylistView {
     const titleInput = this.container.querySelector('#song-title') as HTMLInputElement;
     const artistInput = this.container.querySelector('#song-artist') as HTMLInputElement;
     const urlInput = this.container.querySelector('#song-url') as HTMLInputElement;
-    const addBtn = this.container.querySelector('rgba(76, 60, 87, 1)-song-submit-btn');
+    const addBtn = this.container.querySelector('#add-song-submit-btn');
     const cancelBtn = this.container.querySelector('#cancel-add-song');
     const closeBtn = this.container.querySelector('#close-add-song-modal');
 
