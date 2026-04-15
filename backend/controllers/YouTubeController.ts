@@ -141,13 +141,14 @@ export class YouTubeController {
       console.log(`[YouTubeController:${requestId}] Adding song to playlist...`);
       const song = await playlistManager.addSong(
         playlistId,
+        userId,
         {
           title: videoInfo.title,
           artist: videoInfo.author,
           audioUrl: url,
-        },
-        'youtube',
-        null // No fileId for YouTube videos
+          sourceType: 'youtube',
+          fileId: null
+        }
       );
 
       console.log(`[YouTubeController:${requestId}] ✓ Song added successfully:`, song.id);
