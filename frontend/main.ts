@@ -154,12 +154,13 @@ function renderMainView(): void {
     logoutBtn.addEventListener('click', handleLogout);
   }
 
-  // Initialize StorageQuotaDisplay
+  // Initialize StorageQuotaDisplay (DISABLED - causing 401 errors)
+  // TODO: Re-enable when token timing issue is fully resolved
   const storageQuotaContainer = document.getElementById('storage-quota-container');
   if (storageQuotaContainer) {
-    storageQuotaDisplay = new StorageQuotaDisplay(storageQuotaContainer, uploadApi);
-    // Don't load automatically - will be loaded when user opens upload modal
-    // This avoids 401 errors due to token timing issues
+    // Hide the container completely
+    storageQuotaContainer.style.display = 'none';
+    // storageQuotaDisplay = new StorageQuotaDisplay(storageQuotaContainer, uploadApi);
   }
 
   // Initialize UploadModal
