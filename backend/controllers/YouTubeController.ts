@@ -130,8 +130,8 @@ export class YouTubeController {
 
       console.log(`[YouTubeController:${requestId}] Playlist found. Owner:`, playlist.userId, 'Current user:', userId);
 
-      // Check ownership
-      if (playlist.userId !== userId) {
+      // Check ownership (skip if playlist doesn't have userId for backward compatibility)
+      if (playlist.userId && playlist.userId !== userId) {
         console.log(`[YouTubeController:${requestId}] User does not own playlist`);
         res.status(403).json({ error: 'You do not have permission to modify this playlist' });
         return;
