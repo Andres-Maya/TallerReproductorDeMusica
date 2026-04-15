@@ -22,7 +22,10 @@ app.use(cors({
         /^https:\/\/.*\.netlify\.app$/
       ]
     : '*',
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 app.use(express.json());
 
