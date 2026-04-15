@@ -156,7 +156,7 @@ function renderMainView(): void {
   const storageQuotaContainer = document.getElementById('storage-quota-container');
   if (storageQuotaContainer) {
     storageQuotaDisplay = new StorageQuotaDisplay(storageQuotaContainer, uploadApi);
-    // Load storage quota after a small delay to ensure token is set
+    // Load storage quota after a delay to ensure token is set
     setTimeout(() => {
       if (storageQuotaDisplay) {
         storageQuotaDisplay.load().catch((error) => {
@@ -165,7 +165,7 @@ function renderMainView(): void {
           storageQuotaContainer.style.display = 'none';
         });
       }
-    }, 100);
+    }, 500); // Increased delay to 500ms
   }
 
   // Initialize UploadModal
