@@ -72,8 +72,8 @@ body {
 }
 
 .auth-tab.active {
-  color: #414244;
-  border-bottom-color: #37383b;
+  color: #ffffff;
+  border-bottom-color: #e70404;
 }
 
 .auth-content {
@@ -104,7 +104,7 @@ body {
 
 .form-group input:focus {
   outline: none;
-  border-color: #0f1013;
+  border-color: #e70404;
 }
 
 .form-group input.error {
@@ -174,8 +174,8 @@ body {
 .btn {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #0e1220 0%, #dd1212 100%);
-  color: rgb(42, 41, 43);
+  background: #e70404;
+  color: #ffffff;
   border: none;
   border-radius: 8px;
   font-size: 16px;
