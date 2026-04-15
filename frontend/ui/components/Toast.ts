@@ -185,10 +185,10 @@ export class Toast {
         min-width: 300px;
         max-width: 500px;
         padding: 16px 20px;
-        background-color: #333;
+        background-color: #1a1a1a;
         color: white;
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         opacity: 0;
         transform: translateX(400px);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -196,6 +196,7 @@ export class Toast {
         cursor: pointer;
         font-size: 14px;
         line-height: 1.5;
+        border: 1px solid #2a2a2a;
       }
 
       .toast.show {
@@ -233,23 +234,23 @@ export class Toast {
 
       /* Toast type styles */
       .toast-success {
-        background-color: #4caf50;
-        border-left: 4px solid #2e7d32;
+        background-color: #1a3a1a;
+        border-left: 4px solid #4caf50;
       }
 
       .toast-error {
-        background-color: #f44336;
-        border-left: 4px solid #c62828;
+        background-color: #3a1a1a;
+        border-left: 4px solid #f44336;
       }
 
       .toast-warning {
-        background-color: #ff9800;
-        border-left: 4px solid #e65100;
+        background-color: #3a2a1a;
+        border-left: 4px solid #ff9800;
       }
 
       .toast-info {
-        background-color: #2196f3;
-        border-left: 4px solid #1565c0;
+        background-color: #1a1a1a;
+        border-left: 4px solid #e70404;
       }
 
       /* Responsive design */

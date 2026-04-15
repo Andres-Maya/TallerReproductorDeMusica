@@ -155,15 +155,15 @@ export class StorageQuotaDisplay {
     style.textContent = `
       .storage-quota {
         padding: 1rem;
-        background-color: #f7fafc;
-        border: 2px solid #e2e8f0;
+        background-color: #1a1a1a;
+        border: 2px solid #2a2a2a;
         border-radius: 8px;
         margin-bottom: 1rem;
       }
 
       .storage-quota-warning {
-        border-color: #f6ad55;
-        background-color: #fffaf0;
+        border-color: #e70404;
+        background-color: #2a0000;
       }
 
       .storage-quota-header {
@@ -180,13 +180,13 @@ export class StorageQuotaDisplay {
       .storage-quota-title {
         font-size: 0.9rem;
         font-weight: 600;
-        color: #4a5568;
+        color: #ffffff;
       }
 
       .storage-quota-bar-container {
         width: 100%;
         height: 8px;
-        background-color: #e2e8f0;
+        background-color: #0f0f0f;
         border-radius: 4px;
         overflow: hidden;
         margin-bottom: 0.5rem;
@@ -194,13 +194,13 @@ export class StorageQuotaDisplay {
 
       .storage-quota-bar {
         height: 100%;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(90deg, #e70404 0%, #ff0000 100%);
         transition: width 0.3s ease;
         border-radius: 4px;
       }
 
       .storage-quota-bar-warning {
-        background: linear-gradient(90deg, #f6ad55 0%, #ed8936 100%);
+        background: linear-gradient(90deg, #ff9800 0%, #f44336 100%);
       }
 
       .storage-quota-info {
@@ -211,22 +211,22 @@ export class StorageQuotaDisplay {
       }
 
       .storage-quota-used {
-        color: #4a5568;
+        color: #cccccc;
       }
 
       .storage-quota-percentage {
         font-weight: 600;
-        color: #2d3748;
+        color: #ffffff;
       }
 
       .storage-quota-warning-message {
         margin-top: 0.75rem;
         padding: 0.5rem;
-        background-color: #fef5e7;
-        border: 1px solid #f6ad55;
+        background-color: #2a0000;
+        border: 1px solid #e70404;
         border-radius: 4px;
         font-size: 0.85rem;
-        color: #744210;
+        color: #ffcccc;
       }
 
       .storage-quota-loading,
@@ -234,11 +234,11 @@ export class StorageQuotaDisplay {
         padding: 1rem;
         text-align: center;
         font-size: 0.9rem;
-        color: #718096;
+        color: #cccccc;
       }
 
       .storage-quota-error {
-        color: #e53e3e;
+        color: #ff6666;
       }
     `;
 

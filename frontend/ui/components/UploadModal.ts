@@ -807,7 +807,8 @@ export class UploadModal {
 
       .upload-tabs {
         display: flex;
-        border-bottom: 2px solid #e2e8f0;
+        border-bottom: 2px solid #2a2a2a;
+        background: #0f0f0f;
       }
 
       .upload-tab {
@@ -818,14 +819,14 @@ export class UploadModal {
         border-bottom: 3px solid transparent;
         font-size: 0.95rem;
         font-weight: 600;
-        color: #718096;
+        color: #999999;
         cursor: pointer;
         transition: all 0.2s;
       }
 
       .upload-tab:hover:not(:disabled) {
-        color: #4a5568;
-        background-color: #f7fafc;
+        color: #ffffff;
+        background-color: #1a1a1a;
       }
 
       .upload-tab:disabled {
@@ -834,8 +835,8 @@ export class UploadModal {
       }
 
       .upload-tab-active {
-        color: #667eea;
-        border-bottom-color: #667eea;
+        color: #ffffff;
+        border-bottom-color: #e70404;
       }
 
       .upload-tab-content {
@@ -849,7 +850,7 @@ export class UploadModal {
       .progress-bar-container {
         width: 100%;
         height: 8px;
-        background-color: #e2e8f0;
+        background-color: #0f0f0f;
         border-radius: 4px;
         overflow: hidden;
         margin-bottom: 0.5rem;
@@ -857,14 +858,14 @@ export class UploadModal {
 
       .progress-bar {
         height: 100%;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(90deg, #e70404 0%, #ff0000 100%);
         transition: width 0.3s ease;
       }
 
       .progress-text {
         text-align: center;
         font-size: 0.9rem;
-        color: #4a5568;
+        color: #ffffff;
         font-weight: 600;
       }
 
@@ -873,22 +874,23 @@ export class UploadModal {
       }
 
       .file-drop-zone {
-        border: 2px dashed #cbd5e0;
+        border: 2px dashed #2a2a2a;
         border-radius: 8px;
         padding: 2rem;
         text-align: center;
         transition: all 0.2s;
         cursor: pointer;
+        background: #0f0f0f;
       }
 
       .file-drop-zone:hover {
-        border-color: #667eea;
-        background-color: #f7fafc;
+        border-color: #e70404;
+        background-color: #1a1a1a;
       }
 
       .file-drop-zone.drop-zone-active {
-        border-color: #667eea;
-        background-color: #ebf4ff;
+        border-color: #e70404;
+        background-color: #2a0000;
       }
 
       .drop-zone-content {
@@ -904,12 +906,12 @@ export class UploadModal {
 
       .drop-zone-text {
         font-size: 1rem;
-        color: #4a5568;
+        color: #ffffff;
         font-weight: 500;
       }
 
       .drop-zone-or {
-        color: #a0aec0;
+        color: #999999;
         font-size: 0.9rem;
       }
 
@@ -920,7 +922,7 @@ export class UploadModal {
 
       .drop-zone-hint {
         font-size: 0.85rem;
-        color: #a0aec0;
+        color: #999999;
       }
 
       .file-selected {
@@ -928,8 +930,8 @@ export class UploadModal {
         align-items: center;
         gap: 1rem;
         padding: 1.5rem;
-        background-color: #f7fafc;
-        border: 2px solid #e2e8f0;
+        background-color: #1a1a1a;
+        border: 2px solid #2a2a2a;
         border-radius: 8px;
       }
 
@@ -943,20 +945,20 @@ export class UploadModal {
 
       .file-name {
         font-weight: 600;
-        color: #2d3748;
+        color: #ffffff;
         margin-bottom: 0.25rem;
       }
 
       .file-meta {
         font-size: 0.85rem;
-        color: #718096;
+        color: #cccccc;
       }
 
       .btn-clear-file {
         background: none;
         border: none;
         font-size: 1.5rem;
-        color: #718096;
+        color: #999999;
         cursor: pointer;
         padding: 0.25rem 0.5rem;
         border-radius: 4px;
@@ -964,22 +966,22 @@ export class UploadModal {
       }
 
       .btn-clear-file:hover:not(:disabled) {
-        background-color: #e2e8f0;
-        color: #2d3748;
+        background-color: #2a2a2a;
+        color: #e70404;
       }
 
       .youtube-preview-loading {
         text-align: center;
         padding: 2rem;
-        color: #718096;
+        color: #cccccc;
       }
 
       .youtube-preview {
         display: flex;
         gap: 1rem;
         padding: 1rem;
-        background-color: #f7fafc;
-        border: 2px solid #e2e8f0;
+        background-color: #1a1a1a;
+        border: 2px solid #2a2a2a;
         border-radius: 8px;
         margin-top: 1rem;
       }
@@ -1000,13 +1002,13 @@ export class UploadModal {
 
       .youtube-title {
         font-weight: 600;
-        color: #2d3748;
+        color: #ffffff;
         margin-bottom: 0.5rem;
       }
 
       .youtube-duration {
         font-size: 0.85rem;
-        color: #718096;
+        color: #cccccc;
       }
     `;
 
