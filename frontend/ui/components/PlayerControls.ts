@@ -567,12 +567,12 @@ export class PlayerControls {
 
       .song-info .song-artist {
         font-size: 1rem;
-        color: #718096;
+        color: #242b35ff;
       }
 
       .no-song {
         font-size: 1rem;
-        color: #a0aec0;
+        color: #2d333bff;
         font-style: italic;
       }
 
@@ -586,7 +586,7 @@ export class PlayerControls {
       .time-current,
       .time-duration {
         font-size: 0.85rem;
-        color: #718096;
+        color: #2b313aff;
         min-width: 40px;
       }
 
@@ -597,7 +597,7 @@ export class PlayerControls {
       .progress-bar {
         position: relative;
         height: 6px;
-        background-color: #e2e8f0;
+        background-color: #2e3338ff;
         border-radius: 3px;
         overflow: hidden;
       }
@@ -607,7 +607,7 @@ export class PlayerControls {
         top: 0;
         left: 0;
         height: 100%;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(90deg, #0b0d14ff 0%, #d33232ff 100%);
         border-radius: 3px;
         transition: width 0.1s linear;
       }
@@ -648,7 +648,7 @@ export class PlayerControls {
 
       .control-btn:hover:not(:disabled) {
         opacity: 1;
-        background-color: #f7fafc;
+        background-color: #2e3235ff;
       }
 
       .control-btn:disabled {
@@ -658,11 +658,11 @@ export class PlayerControls {
 
       .control-btn-play {
         font-size: 2rem;
-        background-color: #f7fafc;
+        background-color: #3e4549ff;
       }
 
       .control-btn-play:hover:not(:disabled) {
-        background-color: #edf2f7;
+        background-color: #303438ff;
         transform: scale(1.1);
       }
 
@@ -691,7 +691,7 @@ export class PlayerControls {
         width: 100px;
         height: 4px;
         border-radius: 2px;
-        background: #e2e8f0;
+        background: #373a3fff;
         outline: none;
         -webkit-appearance: none;
       }
@@ -702,7 +702,7 @@ export class PlayerControls {
         width: 14px;
         height: 14px;
         border-radius: 50%;
-        background: #667eea;
+        background: #0a0c13ff;
         cursor: pointer;
       }
 
@@ -710,7 +710,7 @@ export class PlayerControls {
         width: 14px;
         height: 14px;
         border-radius: 50%;
-        background: #667eea;
+        background: #db1b1bff;
         cursor: pointer;
         border: none;
       }

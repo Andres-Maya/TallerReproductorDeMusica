@@ -197,23 +197,23 @@ export class FileDropZone {
     style.id = 'file-drop-zone-styles';
     style.textContent = `
       .file-drop-zone {
-        border: 2px dashed #cbd5e0;
+        border: 2px dashed #373f47ff;
         border-radius: 8px;
         padding: 2rem;
         text-align: center;
         transition: all 0.2s;
         cursor: pointer;
-        background-color: #fff;
+        background-color: #3b3f55ff;
       }
 
       .file-drop-zone:hover:not(.drop-zone-disabled) {
-        border-color: #667eea;
-        background-color: #f7fafc;
+        border-color: #ec3030ff;
+        background-color: #434a4eff;
       }
 
       .file-drop-zone.drop-zone-active {
-        border-color: #667eea;
-        background-color: #ebf4ff;
+        border-color: #e22a2aff;
+        background-color: #34393fff;
         transform: scale(1.02);
       }
 
@@ -235,12 +235,12 @@ export class FileDropZone {
 
       .drop-zone-text {
         font-size: 1rem;
-        color: #4a5568;
+        color: #eeeef0ff;
         font-weight: 500;
       }
 
       .drop-zone-or {
-        color: #a0aec0;
+        color: #e5e7ebff;
         font-size: 0.9rem;
       }
 
@@ -251,7 +251,7 @@ export class FileDropZone {
 
       .drop-zone-hint {
         font-size: 0.85rem;
-        color: #a0aec0;
+        color: #3e4753ff;
       }
     `;
 

@@ -200,7 +200,7 @@ export class ErrorBoundary {
       }
 
       .reload-button {
-        background-color: #2196F3;
+        background-color: #f32133ff;
         color: white;
         border: none;
         padding: 0.75rem 1.5rem;
@@ -211,11 +211,11 @@ export class ErrorBoundary {
       }
 
       .reload-button:hover {
-        background-color: #1976D2;
+        background-color: #11171dff;
       }
 
       .reload-button:active {
-        background-color: #0D47A1;
+        background-color: #131b25ff;
       }
 
       .error-details {

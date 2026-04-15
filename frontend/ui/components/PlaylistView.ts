@@ -585,7 +585,7 @@ export class PlaylistView {
     });
 
     // Add Song button
-    const addSongBtn = this.container.querySelector('#add-song-btn');
+    const addSongBtn = this.container.querySelector('rgba(58, 58, 78, 1)-song-btn');
     addSongBtn?.addEventListener('click', () => {
       this.updateState({
         showAddSongModal: true,
@@ -650,7 +650,7 @@ export class PlaylistView {
     const titleInput = this.container.querySelector('#song-title') as HTMLInputElement;
     const artistInput = this.container.querySelector('#song-artist') as HTMLInputElement;
     const urlInput = this.container.querySelector('#song-url') as HTMLInputElement;
-    const addBtn = this.container.querySelector('#add-song-submit-btn');
+    const addBtn = this.container.querySelector('rgba(76, 60, 87, 1)-song-submit-btn');
     const cancelBtn = this.container.querySelector('#cancel-add-song');
     const closeBtn = this.container.querySelector('#close-add-song-modal');
 
@@ -989,12 +989,12 @@ export class PlaylistView {
       }
 
       .playlist-item:hover {
-        background-color: #f7fafc;
+        background-color: #2c3338ff;
       }
 
       .playlist-item-active {
-        background-color: #ebf4ff;
-        border-color: #667eea;
+        background-color: #2a2f36ff;
+        border-color: #07070aff;
       }
 
       .playlist-info {
@@ -1003,13 +1003,13 @@ export class PlaylistView {
 
       .playlist-name {
         font-weight: 600;
-        color: #2d3748;
+        color: #e9eaecff;
         margin-bottom: 0.25rem;
       }
 
       .playlist-meta {
         font-size: 0.85rem;
-        color: #718096;
+        color: #2f3641ff;
       }
 
       .btn-delete-playlist {

@@ -7,12 +7,12 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: linear-gradient(135deg, #000103 0%, rgb(231, 4, 4) 100%);
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 50%, #0a0a0a 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b6a6d;
+  color: #ffffff;
 }
 
 #app {
@@ -24,17 +24,18 @@ body {
 
 /* Auth Container */
 .auth-container {
-  background: rgb(56, 52, 61);
+  background: #1a1a1a;
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 40px rgba(231, 4, 4, 0.3);
   max-width: 450px;
   margin: 0 auto;
   overflow: hidden;
+  border: 1px solid #2a2a2a;
 }
 
 .auth-header {
-  background: linear-gradient(135deg, #080b14 0%, #e70808 100%);
-  color: rgb(253, 252, 253);
+  background: linear-gradient(135deg, #000000 0%, #e70404 100%);
+  color: #ffffff;
   padding: 40px 30px;
   text-align: center;
 }
@@ -51,7 +52,8 @@ body {
 
 .auth-tabs {
   display: flex;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #2a2a2a;
+  background: #0f0f0f;
 }
 
 .auth-tab {
@@ -61,14 +63,15 @@ body {
   border: none;
   font-size: 16px;
   font-weight: 500;
-  color: #f8f7f7;
+  color: #999999;
   cursor: pointer;
   transition: all 0.3s;
   border-bottom: 3px solid transparent;
 }
 
 .auth-tab:hover {
-  background: #e9e8eb;
+  background: #1a1a1a;
+  color: #ffffff;
 }
 
 .auth-tab.active {
@@ -89,17 +92,19 @@ body {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: #333;
+  color: #ffffff;
 }
 
 .form-group input[type="text"],
 .form-group input[type="password"] {
   width: 100%;
   padding: 12px 15px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #2a2a2a;
   border-radius: 8px;
   font-size: 15px;
-  transition: border-color 0.3s;
+  transition: border-color 0.3s, background-color 0.3s;
+  background: #0f0f0f;
+  color: #ffffff;
 }
 
 .form-group input:focus {
@@ -133,6 +138,7 @@ body {
 .form-checkbox label {
   cursor: pointer;
   user-select: none;
+  color: #ffffff;
 }
 
 /* Password strength indicator */
@@ -142,7 +148,7 @@ body {
 
 .password-strength-bar {
   height: 4px;
-  background: #727070;
+  background: #2a2a2a;
   border-radius: 2px;
   overflow: hidden;
   margin-bottom: 5px;
@@ -167,7 +173,7 @@ body {
 
 .password-strength-text {
   font-size: 12px;
-  color: #dad8d8;
+  color: #cccccc;
 }
 
 /* Buttons */
@@ -186,7 +192,8 @@ body {
 
 .btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(25, 30, 51, 0.4);
+  box-shadow: 0 5px 20px rgba(231, 4, 4, 0.6);
+  background: #ff0000;
 }
 
 .btn:active:not(:disabled) {
@@ -199,8 +206,8 @@ body {
 }
 
 .btn-secondary {
-  background: #464545;
-  color: #aca9a9;
+  background: #2a2a2a;
+  color: #ffffff;
   padding: 10px 20px;
   border: none;
   border-radius: 6px;
@@ -211,22 +218,23 @@ body {
 }
 
 .btn-secondary:hover {
-  background: #35353b;
+  background: #e70404;
 }
 
 /* Main Container */
 .main-container {
-  background: rgb(68, 67, 82);
+  background: #1a1a1a;
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 40px rgba(231, 4, 4, 0.3);
   min-height: 600px;
   display: flex;
   flex-direction: column;
+  border: 1px solid #2a2a2a;
 }
 
 .app-header {
-  background: linear-gradient(135deg, #11121a 0%, #d61818 100%);
-  color: rgb(67, 62, 73);
+  background: linear-gradient(135deg, #000000 0%, #e70404 100%);
+  color: #ffffff;
   padding: 20px 30px;
   display: flex;
   justify-content: space-between;
@@ -262,12 +270,12 @@ body {
 .welcome-message h2 {
   font-size: 32px;
   margin-bottom: 20px;
-  color: #333;
+  color: #ffffff;
 }
 
 .welcome-message p {
   font-size: 18px;
-  color: #666;
+  color: #cccccc;
   margin-bottom: 15px;
 }
 
@@ -286,16 +294,17 @@ body {
 }
 
 .toast {
-  background: rgb(70, 66, 78);
+  background: #1a1a1a;
   padding: 16px 20px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   margin-bottom: 10px;
   min-width: 300px;
   display: flex;
   align-items: center;
   gap: 12px;
   animation: slideIn 0.3s ease-out;
+  border: 1px solid #2a2a2a;
 }
 
 @keyframes slideIn {
@@ -322,7 +331,7 @@ body {
 }
 
 .toast.info {
-  border-left: 4px solid #f32121;
+  border-left: 4px solid #e70404;
 }
 
 .toast-icon {
@@ -331,7 +340,7 @@ body {
 
 .toast-message {
   flex: 1;
-  color: #f5f3f3;
+  color: #ffffff;
 }
 
 /* Loading spinner */
@@ -339,9 +348,9 @@ body {
   display: inline-block;
   width: 20px;
   height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
-  border-top-color: rgb(64, 65, 78);
+  border-top-color: #e70404;
   animation: spin 0.8s linear infinite;
 }
 
@@ -419,9 +428,9 @@ body {
 #player-controls-container {
   position: sticky;
   bottom: 0;
-  background: rgb(85, 79, 92);
+  background: #0f0f0f;
   padding: 1rem 0;
-  border-top: 1px solid #393e46;
+  border-top: 1px solid #e70404;
   z-index: 100;
 }
 
