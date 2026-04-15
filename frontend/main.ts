@@ -194,31 +194,20 @@ function renderMainView(): void {
     playlistView = new PlaylistView(playlistViewContainer, playlistApi, stateManager);
     
     // Wire the "Add Song" button to open UploadModal
-    // We need to intercept the button click after PlaylistView renders
-    // This is done by observing DOM changes
-    const observer = new MutationObserver(() => {
-      const addSongBtn = playlistViewContainer.querySelector('#add-song-btn');
-      if (addSongBtn && uploadModal) {
-        // Remove existing listeners by cloning the button
-        const newBtn = addSongBtn.cloneNode(true);
-        addSongBtn.parentNode?.replaceChild(newBtn, addSongBtn);
+    // Use event delegation to avoid MutationObserver issues
+    playlistViewContainer.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      
+      // Check if the clicked element is the "Add Song" button
+      if (target.id === 'add-song-btn' || target.closest('#add-song-btn')) {
+        e.preventDefault();
+        e.stopPropagation();
         
-        // Add new listener to open UploadModal
-        newBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          const appState = stateManager.getState();
-          if (appState.currentPlaylist && uploadModal) {
-            uploadModal.show(appState.currentPlaylist);
-          }
-        });
+        const appState = stateManager.getState();
+        if (appState.currentPlaylist && uploadModal) {
+          uploadModal.show(appState.currentPlaylist);
+        }
       }
-    });
-    
-    observer.observe(playlistViewContainer, {
-      childList: true,
-      subtree: true,
     });
   }
 
