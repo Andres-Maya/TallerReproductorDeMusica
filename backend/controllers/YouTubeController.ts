@@ -121,17 +121,17 @@ export class YouTubeController {
       const { playlistManager, playlistRepository } = require('../config/dependencies').dependencies;
       
       // Get the playlist
-      const playlist = await playlistRepository.findById(playlistId);
-      if (!playlist) {
+      const result = await playlistRepository.findById(playlistId);
+      if (!result) {
         console.log(`[YouTubeController:${requestId}] Playlist not found:`, playlistId);
         res.status(404).json({ error: 'Playlist not found' });
         return;
       }
 
-      console.log(`[YouTubeController:${requestId}] Playlist found. Owner:`, playlist.userId, 'Current user:', userId);
+      console.log(`[YouTubeController:${requestId}] Playlist found. Owner:`, result.playlist.userId, 'Current user:', userId);
 
       // Check ownership (skip if playlist doesn't have userId for backward compatibility)
-      if (playlist.userId && playlist.userId !== userId) {
+      if (result.playlist.userId && result.playlist.userId !== userId) {
         console.log(`[YouTubeController:${requestId}] User does not own playlist`);
         res.status(403).json({ error: 'You do not have permission to modify this playlist' });
         return;

@@ -62,11 +62,14 @@ export class Song {
     }
 
     // Validate fileId consistency
-    if ((this.sourceType === 'upload' || this.sourceType === 'youtube') && !this.fileId) {
-      errors.push('fileId is required for upload and youtube source types');
+    if (this.sourceType === 'upload' && !this.fileId) {
+      errors.push('fileId is required for upload source type');
     }
     if (this.sourceType === 'url' && this.fileId !== null) {
       errors.push('fileId must be null for url source type');
+    }
+    if (this.sourceType === 'youtube' && this.fileId !== null) {
+      errors.push('fileId must be null for youtube source type');
     }
 
     return errors;
@@ -78,7 +81,7 @@ export class Song {
 
   /** Check if this song is from an uploaded file */
   isUploadedFile(): boolean {
-    return this.sourceType === 'upload' || this.sourceType === 'youtube';
+    return this.sourceType === 'upload';
   }
 
   /** Serialize to a plain object (DTO) for JSON responses. */
