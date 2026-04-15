@@ -128,6 +128,8 @@ export class YouTubeController {
         return;
       }
 
+      console.log(`[YouTubeController:${requestId}] Playlist found. Owner:`, playlist.userId, 'Current user:', userId);
+
       // Check ownership
       if (playlist.userId !== userId) {
         console.log(`[YouTubeController:${requestId}] User does not own playlist`);
