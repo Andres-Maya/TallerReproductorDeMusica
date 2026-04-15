@@ -56,8 +56,8 @@ export class PlaylistManager {
       throw new NotFoundError(`Playlist '${playlistId}' not found`);
     }
 
-    // Verify ownership
-    if (result.playlist.userId !== userId) {
+    // Verify ownership (skip if playlist doesn't have userId for backward compatibility)
+    if (result.playlist.userId && result.playlist.userId !== userId) {
       throw new ForbiddenError('You do not have permission to access this playlist');
     }
 
@@ -82,8 +82,8 @@ export class PlaylistManager {
       throw new NotFoundError(`Playlist '${playlistId}' not found`);
     }
 
-    // Verify ownership
-    if (result.playlist.userId !== userId) {
+    // Verify ownership (skip if playlist doesn't have userId for backward compatibility)
+    if (result.playlist.userId && result.playlist.userId !== userId) {
       throw new ForbiddenError('You do not have permission to modify this playlist');
     }
 
@@ -107,8 +107,8 @@ export class PlaylistManager {
       throw new NotFoundError(`Playlist '${playlistId}' not found`);
     }
 
-    // Verify ownership
-    if (result.playlist.userId !== userId) {
+    // Verify ownership (skip if playlist doesn't have userId for backward compatibility)
+    if (result.playlist.userId && result.playlist.userId !== userId) {
       throw new ForbiddenError('You do not have permission to delete this playlist');
     }
 
@@ -139,8 +139,8 @@ export class PlaylistManager {
       throw new NotFoundError(`Playlist '${playlistId}' not found`);
     }
 
-    // Verify ownership
-    if (result.playlist.userId !== userId) {
+    // Verify ownership (skip if playlist doesn't have userId for backward compatibility)
+    if (result.playlist.userId && result.playlist.userId !== userId) {
       throw new ForbiddenError('You do not have permission to modify this playlist');
     }
 
@@ -187,8 +187,8 @@ export class PlaylistManager {
       throw new NotFoundError(`Playlist '${playlistId}' not found`);
     }
 
-    // Verify ownership
-    if (result.playlist.userId !== userId) {
+    // Verify ownership (skip if playlist doesn't have userId for backward compatibility)
+    if (result.playlist.userId && result.playlist.userId !== userId) {
       throw new ForbiddenError('You do not have permission to modify this playlist');
     }
 
@@ -218,8 +218,8 @@ export class PlaylistManager {
       throw new NotFoundError(`Playlist '${playlistId}' not found`);
     }
 
-    // Verify ownership
-    if (result.playlist.userId !== userId) {
+    // Verify ownership (skip if playlist doesn't have userId for backward compatibility)
+    if (result.playlist.userId && result.playlist.userId !== userId) {
       throw new ForbiddenError('You do not have permission to access this playlist');
     }
 
@@ -244,8 +244,8 @@ export class PlaylistManager {
       throw new NotFoundError(`Playlist '${playlistId}' not found`);
     }
 
-    // Verify ownership
-    if (result.playlist.userId !== userId) {
+    // Verify ownership (skip if playlist doesn't have userId for backward compatibility)
+    if (result.playlist.userId && result.playlist.userId !== userId) {
       throw new ForbiddenError('You do not have permission to modify this playlist');
     }
 
