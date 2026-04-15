@@ -8,6 +8,8 @@ import { PlaylistRepository } from '../persistence/PlaylistRepository';
  * Encapsulates all playlist + song management logic with user isolation.
  * All operations require a userId to ensure multi-user data separation.
  * 
+ * Updated: 2025-02-13 - Added backward compatibility for playlists without userId
+ * 
  * **Validates: Requirements 9.1, 9.2, 9.3, 9.5**
  */
 export class PlaylistManager {
