@@ -20,31 +20,48 @@ export class YouTubeController {
    * Body: { url: string }
    */
   getPreview = async (req: Request, res: Response): Promise<void> => {
+    const requestId = Math.random().toString(36).substring(7);
+    console.log(`[YouTubeController:${requestId}] Preview request received`);
+    
     try {
       const { url } = req.body;
 
       if (!url) {
+        console.log(`[YouTubeController:${requestId}] Missing URL in request`);
         res.status(400).json({ error: 'URL is required' });
         return;
       }
 
+      console.log(`[YouTubeController:${requestId}] URL:`, url);
+
       // Validate YouTube URL
       const validationResult = this.fileValidator.validateYoutubeUrl(url);
       if (!validationResult.isValid) {
+        console.log(`[YouTubeController:${requestId}] URL validation failed:`, validationResult.errors);
         res.status(400).json({ error: validationResult.errors.join(', ') });
         return;
       }
 
+      console.log(`[YouTubeController:${requestId}] Calling YouTubeExtractor.getVideoInfo...`);
       const videoInfo = await this.youtubeExtractor.getVideoInfo(url);
+      console.log(`[YouTubeController:${requestId}] ✓ Success:`, videoInfo.title);
 
       res.status(200).json(videoInfo);
     } catch (error: any) {
-      console.error('YouTube preview error:', error);
+      console.error(`[YouTubeController:${requestId}] Error:`, {
+        message: error.message,
+        stack: error.stack?.split('\n').slice(0, 3).join('\n')
+      });
       
       if (error.message.includes('unavailable') || error.message.includes('restricted')) {
         res.status(404).json({ error: error.message });
+      } else if (error.message.includes('Invalid YouTube URL')) {
+        res.status(400).json({ error: error.message });
       } else {
-        res.status(500).json({ error: 'Failed to get video information' });
+        res.status(500).json({ 
+          error: 'Failed to get video information',
+          details: error.message 
+        });
       }
     }
   };
