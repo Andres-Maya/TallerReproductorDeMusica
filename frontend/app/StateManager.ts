@@ -11,7 +11,7 @@
  * Requirements: 8.9, 8.10, 1.2
  */
 
-import type { SongDTO } from '../../Song';
+import type { SongDTO } from '../api/PlaylistApi';
 
 /**
  * User state information
