@@ -78,7 +78,7 @@ export class YouTubeController {
     
     try {
       const { url, playlistId } = req.body;
-      const userId = (req as any).user?.id;
+      const userId = (req as any).user?.userId;
 
       if (!url) {
         console.log(`[YouTubeController:${requestId}] Missing URL in request`);
