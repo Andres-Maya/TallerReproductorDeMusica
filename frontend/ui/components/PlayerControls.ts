@@ -264,9 +264,13 @@ export class PlayerControls {
    * @private
    */
   private loadYouTubeSong(song: SongDTO): void {
+    console.log('[PlayerControls] Loading YouTube song:', song.title);
     const videoId = this.extractYouTubeVideoId(song.audioUrl);
     
+    console.log('[PlayerControls] Extracted video ID:', videoId);
+    
     if (!videoId) {
+      console.error('[PlayerControls] Failed to extract video ID from URL:', song.audioUrl);
       this.updateState({
         currentSong: song,
         error: 'Invalid YouTube URL',
@@ -291,6 +295,7 @@ export class PlayerControls {
     // Wait for YouTube API to be ready
     const initPlayer = () => {
       if (!this.youtubePlayerReady || !(window as any).YT) {
+        console.log('[PlayerControls] Waiting for YouTube API...');
         setTimeout(initPlayer, 100);
         return;
       }
@@ -298,13 +303,18 @@ export class PlayerControls {
       // Create or update YouTube player
       const playerElement = document.getElementById('youtube-player');
       if (!playerElement) {
+        console.error('[PlayerControls] YouTube player element not found');
         setTimeout(initPlayer, 100);
         return;
       }
 
+      console.log('[PlayerControls] YouTube API ready, initializing player...');
+
       if (this.youtubePlayer) {
+        console.log('[PlayerControls] Loading video into existing player:', videoId);
         this.youtubePlayer.loadVideoById(videoId);
       } else {
+        console.log('[PlayerControls] Creating new YouTube player:', videoId);
         this.youtubePlayer = new (window as any).YT.Player('youtube-player', {
           height: '0',
           width: '0',
@@ -315,7 +325,9 @@ export class PlayerControls {
           },
           events: {
             onReady: (event: any) => {
+              console.log('[PlayerControls] YouTube player ready');
               const duration = event.target.getDuration();
+              console.log('[PlayerControls] Video duration:', duration);
               this.updateState({ duration });
               
               // Set volume
@@ -334,6 +346,7 @@ export class PlayerControls {
             },
             onStateChange: (event: any) => {
               const YT = (window as any).YT;
+              console.log('[PlayerControls] YouTube player state changed:', event.data);
               if (event.data === YT.PlayerState.PLAYING) {
                 this.updateState({ isPlaying: true });
               } else if (event.data === YT.PlayerState.PAUSED) {
@@ -343,6 +356,7 @@ export class PlayerControls {
               }
             },
             onError: (event: any) => {
+              console.error('[PlayerControls] YouTube player error:', event.data);
               let errorMessage = 'Failed to load YouTube video';
               switch (event.data) {
                 case 2:
@@ -377,14 +391,16 @@ export class PlayerControls {
   private async play(): Promise<void> {
     try {
       if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+        console.log('[PlayerControls] Playing YouTube video');
         this.youtubePlayer.playVideo();
         this.updateState({ isPlaying: true, error: null });
       } else {
+        console.log('[PlayerControls] Playing audio file');
         await this.audio.play();
         this.updateState({ isPlaying: true, error: null });
       }
     } catch (error) {
-      console.error('Play error:', error);
+      console.error('[PlayerControls] Play error:', error);
       this.updateState({
         error: 'Failed to play audio',
         isPlaying: false,
