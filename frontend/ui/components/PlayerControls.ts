@@ -733,6 +733,13 @@ export class PlayerControls {
       return;
     }
     
+    // Don't re-render if only duration changed (to avoid destroying YouTube player)
+    // Just update the duration display directly
+    if (Object.keys(partial).length === 1 && 'duration' in partial) {
+      this.updateDurationDisplay();
+      return;
+    }
+    
     this.render();
     this.attachEventListeners();
   }
@@ -755,6 +762,7 @@ export class PlayerControls {
     }
     if (progressSlider) {
       progressSlider.value = currentTime.toString();
+      progressSlider.max = duration.toString();
     }
     if (timeCurrentEl) {
       timeCurrentEl.textContent = this.formatTime(currentTime);
@@ -771,6 +779,24 @@ export class PlayerControls {
     if (playPauseBtn) {
       playPauseBtn.textContent = this.state.isPlaying ? '⏸️' : '▶️';
       playPauseBtn.setAttribute('title', this.state.isPlaying ? 'Pause' : 'Play');
+    }
+  }
+
+  /**
+   * Update duration display without full re-render
+   * 
+   * @private
+   */
+  private updateDurationDisplay(): void {
+    const { duration } = this.state;
+    const timeDurationEl = this.container.querySelector('.time-duration');
+    const progressSlider = this.container.querySelector('.progress-slider') as HTMLInputElement;
+    
+    if (timeDurationEl) {
+      timeDurationEl.textContent = this.formatTime(duration);
+    }
+    if (progressSlider) {
+      progressSlider.max = duration.toString();
     }
   }
 
