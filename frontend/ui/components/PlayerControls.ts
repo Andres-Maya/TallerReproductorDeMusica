@@ -41,6 +41,8 @@ export class PlayerControls {
   private stateManager: StateManager;
   private state: PlayerControlsState;
   private audio: HTMLAudioElement;
+  private youtubePlayer: any; // YouTube IFrame Player
+  private youtubePlayerReady: boolean = false;
   private unsubscribe?: () => void;
   private updateInterval?: number;
 
@@ -51,6 +53,9 @@ export class PlayerControls {
     // Initialize audio element
     this.audio = new Audio();
     this.audio.preload = 'metadata';
+
+    // Load YouTube IFrame API
+    this.loadYouTubeAPI();
 
     // Initialize state
     this.state = {
@@ -97,6 +102,54 @@ export class PlayerControls {
         this.loadSong(newSong);
       }
     }
+  }
+
+  /**
+   * Load YouTube IFrame API
+   * 
+   * @private
+   */
+  private loadYouTubeAPI(): void {
+    // Check if API is already loaded
+    if ((window as any).YT) {
+      this.youtubePlayerReady = true;
+      return;
+    }
+
+    // Load the IFrame Player API code asynchronously
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+
+    // API will call this function when ready
+    (window as any).onYouTubeIframeAPIReady = () => {
+      this.youtubePlayerReady = true;
+    };
+  }
+
+  /**
+   * Extract YouTube video ID from URL
+   * 
+   * @param url - YouTube URL
+   * @returns Video ID or null
+   * 
+   * @private
+   */
+  private extractYouTubeVideoId(url: string): string | null {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\?\/]+)/,
+      /youtube\.com\/embed\/([^&\?\/]+)/,
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -174,28 +227,17 @@ export class PlayerControls {
   private loadSong(song: SongDTO): void {
     // Pause current playback
     this.audio.pause();
+    if (this.youtubePlayer) {
+      this.youtubePlayer.stopVideo();
+    }
 
-    // Check if URL is potentially problematic
-    const url = song.audioUrl.toLowerCase();
-    const isExternalUrl = url.includes('youtube.com') || 
-                         url.includes('youtu.be') || 
-                         url.includes('soundcloud.com') ||
-                         url.includes('spotify.com');
-    
-    if (isExternalUrl) {
-      this.updateState({
-        currentSong: song,
-        currentTime: 0,
-        duration: 0,
-        isPlaying: false,
-        error: 'Cannot play external URLs directly. Please use the upload or YouTube extraction feature to add this song.',
-      });
-      this.render();
-      this.attachEventListeners();
+    // Check if this is a YouTube song
+    if (song.sourceType === 'youtube') {
+      this.loadYouTubeSong(song);
       return;
     }
 
-    // Load new song
+    // For regular audio files
     this.audio.src = song.audioUrl;
     this.updateState({
       currentSong: song,
@@ -215,14 +257,132 @@ export class PlayerControls {
   }
 
   /**
+   * Load a YouTube song
+   * 
+   * @param song - YouTube song to load
+   * 
+   * @private
+   */
+  private loadYouTubeSong(song: SongDTO): void {
+    const videoId = this.extractYouTubeVideoId(song.audioUrl);
+    
+    if (!videoId) {
+      this.updateState({
+        currentSong: song,
+        error: 'Invalid YouTube URL',
+        isPlaying: false,
+      });
+      this.render();
+      this.attachEventListeners();
+      return;
+    }
+
+    this.updateState({
+      currentSong: song,
+      currentTime: 0,
+      duration: 0,
+      isPlaying: false,
+      error: null,
+    });
+
+    this.render();
+    this.attachEventListeners();
+
+    // Wait for YouTube API to be ready
+    const initPlayer = () => {
+      if (!this.youtubePlayerReady || !(window as any).YT) {
+        setTimeout(initPlayer, 100);
+        return;
+      }
+
+      // Create or update YouTube player
+      const playerElement = document.getElementById('youtube-player');
+      if (!playerElement) {
+        setTimeout(initPlayer, 100);
+        return;
+      }
+
+      if (this.youtubePlayer) {
+        this.youtubePlayer.loadVideoById(videoId);
+      } else {
+        this.youtubePlayer = new (window as any).YT.Player('youtube-player', {
+          height: '0',
+          width: '0',
+          videoId: videoId,
+          playerVars: {
+            autoplay: 0,
+            controls: 0,
+          },
+          events: {
+            onReady: (event: any) => {
+              const duration = event.target.getDuration();
+              this.updateState({ duration });
+              
+              // Set volume
+              event.target.setVolume(this.state.volume * 100);
+              
+              // Start time update interval
+              if (this.updateInterval) {
+                clearInterval(this.updateInterval);
+              }
+              this.updateInterval = window.setInterval(() => {
+                if (this.youtubePlayer && this.state.currentSong?.sourceType === 'youtube') {
+                  const currentTime = this.youtubePlayer.getCurrentTime();
+                  this.updateState({ currentTime });
+                }
+              }, 100);
+            },
+            onStateChange: (event: any) => {
+              const YT = (window as any).YT;
+              if (event.data === YT.PlayerState.PLAYING) {
+                this.updateState({ isPlaying: true });
+              } else if (event.data === YT.PlayerState.PAUSED) {
+                this.updateState({ isPlaying: false });
+              } else if (event.data === YT.PlayerState.ENDED) {
+                this.updateState({ isPlaying: false });
+              }
+            },
+            onError: (event: any) => {
+              let errorMessage = 'Failed to load YouTube video';
+              switch (event.data) {
+                case 2:
+                  errorMessage = 'Invalid YouTube video ID';
+                  break;
+                case 5:
+                  errorMessage = 'HTML5 player error';
+                  break;
+                case 100:
+                  errorMessage = 'Video not found or private';
+                  break;
+                case 101:
+                case 150:
+                  errorMessage = 'Video cannot be embedded';
+                  break;
+              }
+              this.updateState({ error: errorMessage, isPlaying: false });
+            },
+          },
+        });
+      }
+    };
+
+    initPlayer();
+  }
+
+  /**
    * Play audio
    * 
    * Requirements: 3.6
    */
   private async play(): Promise<void> {
     try {
-      await this.audio.play();
-      this.updateState({ isPlaying: true, error: null });
+      if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+        this.youtubePlayer.playVideo();
+        this.updateState({ isPlaying: true, error: null });
+      } else {
+        await this.audio.play();
+        this.updateState({ isPlaying: true, error: null });
+      }
     } catch (error) {
       console.error('Play error:', error);
       this.updateState({
@@ -238,7 +398,11 @@ export class PlayerControls {
    * Requirements: 3.6
    */
   private pause(): void {
-    this.audio.pause();
+    if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+      this.youtubePlayer.pauseVideo();
+    } else {
+      this.audio.pause();
+    }
     this.updateState({ isPlaying: false });
   }
 
@@ -263,7 +427,11 @@ export class PlayerControls {
    * Requirements: 3.8
    */
   private seek(time: number): void {
-    this.audio.currentTime = time;
+    if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+      this.youtubePlayer.seekTo(time, true);
+    } else {
+      this.audio.currentTime = time;
+    }
     this.updateState({ currentTime: time });
   }
 
@@ -275,7 +443,11 @@ export class PlayerControls {
    * Requirements: 3.7
    */
   private setVolume(volume: number): void {
-    this.audio.volume = volume;
+    if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+      this.youtubePlayer.setVolume(volume * 100);
+    } else {
+      this.audio.volume = volume;
+    }
     this.updateState({ volume, isMuted: volume === 0 });
     this.savePlaybackState();
   }
@@ -287,10 +459,19 @@ export class PlayerControls {
    */
   private toggleMute(): void {
     if (this.state.isMuted) {
-      this.audio.volume = this.state.volume;
+      if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+        this.youtubePlayer.unMute();
+        this.youtubePlayer.setVolume(this.state.volume * 100);
+      } else {
+        this.audio.volume = this.state.volume;
+      }
       this.updateState({ isMuted: false });
     } else {
-      this.audio.volume = 0;
+      if (this.state.currentSong?.sourceType === 'youtube' && this.youtubePlayer) {
+        this.youtubePlayer.mute();
+      } else {
+        this.audio.volume = 0;
+      }
       this.updateState({ isMuted: true });
     }
   }
@@ -374,11 +555,15 @@ export class PlayerControls {
           </div>
         ` : ''}
 
+        <!-- Hidden YouTube player -->
+        <div id="youtube-player" style="display: none;"></div>
+
         <div class="player-info">
           ${currentSong ? `
             <div class="song-info">
               <div class="song-title">${this.escapeHtml(currentSong.title)}</div>
               <div class="song-artist">${this.escapeHtml(currentSong.artist)}</div>
+              ${currentSong.sourceType === 'youtube' ? '<div class="song-source">🎵 YouTube</div>' : ''}
             </div>
           ` : `
             <div class="no-song">No song selected</div>
@@ -570,6 +755,13 @@ export class PlayerControls {
         color: #242b35ff;
       }
 
+      .song-info .song-source {
+        font-size: 0.85rem;
+        color: #ff0000;
+        margin-top: 0.25rem;
+        font-weight: 500;
+      }
+
       .no-song {
         font-size: 1rem;
         color: #2d333bff;
@@ -726,6 +918,12 @@ export class PlayerControls {
     // Stop playback
     this.audio.pause();
     this.audio.src = '';
+
+    // Destroy YouTube player
+    if (this.youtubePlayer) {
+      this.youtubePlayer.destroy();
+      this.youtubePlayer = null;
+    }
 
     // Clear interval
     if (this.updateInterval) {
