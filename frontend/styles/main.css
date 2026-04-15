@@ -12,7 +12,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #e0dfe2;
+  color: #6b6a6d;
 }
 
 #app {
@@ -34,7 +34,7 @@ body {
 
 .auth-header {
   background: linear-gradient(135deg, #080b14 0%, #e70808 100%);
-  color: rgb(57, 53, 63);
+  color: rgb(253, 252, 253);
   padding: 40px 30px;
   text-align: center;
 }
@@ -68,12 +68,12 @@ body {
 }
 
 .auth-tab:hover {
-  background: #403d47;
+  background: #e9e8eb;
 }
 
 .auth-tab.active {
   color: #414244;
-  border-bottom-color: #06080e;
+  border-bottom-color: #37383b;
 }
 
 .auth-content {
