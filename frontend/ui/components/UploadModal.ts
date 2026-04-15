@@ -61,19 +61,22 @@ export class UploadModal {
   private playlistId: string;
   private state: UploadModalState;
   private isVisible: boolean = false;
+  private storageQuotaDisplay: any = null; // StorageQuotaDisplay
 
   constructor(
     container: HTMLElement,
     uploadApi: UploadApi,
     youtubeApi: YouTubeApi,
     playlistApi: any, // PlaylistApi
-    onSongAdded: (song: SongDTO) => void
+    onSongAdded: (song: SongDTO) => void,
+    storageQuotaDisplay?: any // Optional StorageQuotaDisplay
   ) {
     this.container = container;
     this.uploadApi = uploadApi;
     this.youtubeApi = youtubeApi;
     this.playlistApi = playlistApi;
     this.onSongAdded = onSongAdded;
+    this.storageQuotaDisplay = storageQuotaDisplay || null;
     this.playlistId = '';
 
     // Initialize state with last selected tab from localStorage
@@ -108,6 +111,13 @@ export class UploadModal {
     this.resetState();
     this.render();
     this.attachEventListeners();
+    
+    // Load storage quota when modal opens (token should be ready by now)
+    if (this.storageQuotaDisplay) {
+      this.storageQuotaDisplay.load().catch((error: Error) => {
+        console.warn('Storage quota not available:', error);
+      });
+    }
   }
 
   /**
