@@ -13,7 +13,7 @@
  */
 
 import { PlaylistApi, SongDTO } from '../../api/PlaylistApi';
-import { StateManager, Playlist } from '../../app/StateManager';
+import { StateManager, Playlist, type AppState } from '../../app/StateManager';
 
 /**
  * PlaylistView component state
@@ -103,7 +103,7 @@ export class PlaylistView {
    * 
    * Requirements: 1.2
    */
-  private handleStateChange(appState: Readonly<typeof appState>): void {
+  private handleStateChange(appState: Readonly<AppState>): void {
     // Re-render when playlists or currentPlaylist changes
     this.render();
     this.attachEventListeners();

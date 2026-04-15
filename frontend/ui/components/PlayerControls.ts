@@ -12,7 +12,7 @@
  * Requirements: 3.6, 3.7, 3.8
  */
 
-import { StateManager } from '../../app/StateManager';
+import { StateManager, type AppState } from '../../app/StateManager';
 import type { SongDTO } from '../../api/PlaylistApi';
 
 /**
@@ -89,7 +89,7 @@ export class PlayerControls {
    * 
    * Requirements: 3.6
    */
-  private handleStateChange(appState: Readonly<typeof appState>): void {
+  private handleStateChange(appState: Readonly<AppState>): void {
     // Update current song if playback state changes
     if (appState.playbackState?.currentSong) {
       const newSong = appState.playbackState.currentSong as SongDTO;
